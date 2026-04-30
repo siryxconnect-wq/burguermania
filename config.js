@@ -18,5 +18,5 @@
 
 window.SIRYX_CONFIG = {
   gymId:  'burger_mania',   // ID del cliente (mismo que en el keygen)
-  gymKey: '0FVH-0FWC-6594',   // Clave XXXX-XXXX-XXXX del keygen
+  gymKey: '0FVH-0FWB-6589',   // Clave XXXX-XXXX-XXXX del keygen
 };
