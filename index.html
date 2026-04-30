@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>SiryX Comandas</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
@@ -291,6 +292,31 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
 
 /* ══ SEGURIDAD ══ */
 /* (same as before) */
+
+/* ══ PANTALLA DE ACTIVACIÓN ══ */
+#activationOverlay {
+  position: fixed; inset: 0; background: var(--bg); z-index: 2000;
+  display: none; align-items: center; justify-content: center; padding: 20px;
+  background-image: radial-gradient(circle at 50% 50%, rgba(59, 139, 255, 0.1) 0%, transparent 50%);
+}
+#activationOverlay.open { display: flex; animation: fadeIn 0.4s ease; }
+.activation-card {
+  background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+  width: 100%; max-width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+.activation-logo { font-size: 32px; font-weight: 800; margin-bottom: 10px; color: #fff; }
+.activation-logo span { color: var(--accent); }
+.activation-status { font-size: 13px; color: var(--muted); margin-bottom: 30px; line-height: 1.5; }
+.activation-field { margin-bottom: 20px; text-align: left; }
+.activation-field label { display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; font-weight: 600; }
+.activation-input {
+  width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+  padding: 14px; border-radius: 12px; color: #fff; font-family: var(--mono);
+  font-size: 18px; letter-spacing: 2px; text-align: center; outline: none; transition: var(--transition);
+}
+.activation-input:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(59,139,255,0.2); }
+.activation-error { color: var(--red); font-size: 12px; margin-top: 10px; display: none; }
 
 /* TOAST */
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);color:var(--text);padding:10px 20px;border-radius:20px;font-size:13px;font-weight:500;z-index:1000;transition:transform .35s cubic-bezier(.34,1.4,.64,1);white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.4)}
@@ -828,7 +854,118 @@ Sin precios también funciona:
 //  ESTADO
 // ══════════════════════════════════════
 let comandas = JSON.parse(localStorage.getItem('siryx_comandas')||'[]');
-let cfg = JSON.parse(localStorage.getItem('siryx_cfg')||'{}');
+// ══ CONFIGURACIÓN SUPABASE ══
+const SUPABASE_URL = 'https://TU_PROYECTO.supabase.co';
+const SUPABASE_KEY = 'TU_ANON_KEY_AQUÍ';
+let supabase = null;
+
+if (!SUPABASE_URL.includes('TU_PROYECTO')) {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+}
+
+async function checkLicense() {
+    if (!supabase) {
+        console.warn('Modo Desarrollo: Sin Supabase configurado');
+        return;
+    }
+
+    const savedId = localStorage.getItem('siryx_license_id');
+    if (!savedId) {
+        showActivation(true);
+        return;
+    }
+
+    try {
+        const { data, error } = await supabase
+            .from('clients')
+            .select('*')
+            .eq('id', savedId)
+            .single();
+
+        if (error || !data) {
+            localStorage.removeItem('siryx_license_id');
+            showActivation(true, "ID de restaurante ya no es válido.");
+            return;
+        }
+
+        const expiry = new Date(data.expiry_date);
+        if (expiry < new Date()) {
+            showActivation(true, "Tu licencia ha vencido el " + expiry.toLocaleDateString() + ". Por favor contacta a soporte para renovar.");
+            return;
+        }
+
+        // Licencia OK - Asegurar nombre del resto
+        if (data.name) cfg.resto = data.name;
+    } catch (e) {
+        console.error("Error validando licencia:", e);
+    }
+}
+
+async function validateLicense() {
+    if (!supabase) {
+        alert('Configura las llaves de Supabase para activar.');
+        return;
+    }
+
+    const id = document.getElementById('activationInput').value.trim().toUpperCase();
+    if (!id) return;
+
+    const btn = document.getElementById('btnActivate');
+    const spinner = document.getElementById('activationSpinner');
+    const err = document.getElementById('activationError');
+    
+    btn.disabled = true;
+    spinner.style.display = 'block';
+    err.style.display = 'none';
+
+    try {
+        const { data, error } = await supabase
+            .from('clients')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+        if (error || !data) {
+            err.textContent = "ID de restaurante no encontrado.";
+            err.style.display = 'block';
+        } else {
+            const expiry = new Date(data.expiry_date);
+            if (expiry < new Date()) {
+                err.textContent = "Esta licencia venció el " + expiry.toLocaleDateString();
+                err.style.display = 'block';
+            } else {
+                // ÉXITO
+                localStorage.setItem('siryx_license_id', id);
+                if (data.name) cfg.resto = data.name;
+                localStorage.setItem('siryx_cfg', JSON.stringify(cfg));
+                toast('✅ Licencia activada: ' + data.name);
+                showActivation(false);
+                actualizarHeaderLogo();
+            }
+        }
+    } catch (e) {
+        err.textContent = "Error de conexión.";
+        err.style.display = 'block';
+    } finally {
+        btn.disabled = false;
+        spinner.style.display = 'none';
+    }
+}
+
+function showActivation(show, msg) {
+    const overlay = document.getElementById('activationOverlay');
+    if (show) {
+        overlay.classList.add('open');
+        if (msg) document.getElementById('activationStatus').textContent = msg;
+    } else {
+        overlay.classList.remove('open');
+    }
+}
+
+let cfg = JSON.parse(localStorage.getItem('siryx_cfg') || '{}');
+document.addEventListener('DOMContentLoaded', () => {
+    checkLicense();
+});
 let ordenActual = null;
 let counter = parseInt(localStorage.getItem('siryx_counter')||'1');
 let chartSemana=null,chartHoras=null,chartComp=null;
@@ -2255,5 +2392,22 @@ if(checkLicencia()){
 }
 
 </script>
+    <!-- RESTO DE LA APP -->
+    <div id="activationOverlay">
+        <div class="activation-card">
+            <div class="activation-logo">SiryX<span>.</span></div>
+            <div class="activation-status" id="activationStatus">Bienvenido a la plataforma SiryX. Para comenzar, ingresa el ID de restaurante proporcionado por tu distribuidor.</div>
+            <div class="activation-field">
+                <label>ID de Restaurante</label>
+                <input type="text" id="activationInput" class="activation-input" placeholder="RX-000" maxlength="8">
+                <div id="activationError" class="activation-error">ID no válido o licencia expirada.</div>
+            </div>
+            <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 14px;" id="btnActivate" onclick="validateLicense()">
+                <span class="spinner" id="activationSpinner" style="display: none;"></span>
+                Activar Licencia
+            </button>
+            <div style="margin-top: 20px; font-size: 10px; color: var(--muted);">© 2026 SiryX Comandas · Sistema Protegido</div>
+        </div>
+    </div>
 </body>
 </html>
