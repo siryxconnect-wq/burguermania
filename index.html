@@ -2220,6 +2220,11 @@ function renderDashboard(){
     : \`<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:16px">Sin registros</td></tr>\`;
 }
 
+// ══ CONFIGURACIÓN NUBE (SUPABASE) ══
+const SUPABASE_URL = 'https://nlicutwfjntcsgxocjaz.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_zWFZkQ3w4CtLntMB9vN_0Q_Hnva-UxR';
+const dbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 // ══ SISTEMA DE LICENCIA ══
 // Clave secreta compartida entre keygen y app (no visible para el usuario final)
 const LICENSE_SECRET = 'SiryX2024$Connect#';
