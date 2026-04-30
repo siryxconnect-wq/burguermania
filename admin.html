@@ -358,19 +358,19 @@
         const SUPABASE_URL = 'https://TU_PROYECTO.supabase.co';
         const SUPABASE_KEY = 'TU_ANON_KEY_AQUÍ';
 
-        let supabase = null;
+        let dbClient = null;
         if (SUPABASE_URL.includes('TU_PROYECTO')) {
             console.warn('⚠️ Falta configurar las llaves de Supabase en admin.html');
         } else {
-            supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            dbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         }
 
         let clients = [];
 
         async function fetchClients() {
-            if (!supabase) return loadMockData();
+            if (!dbClient) return loadMockData();
             
-            const { data, error } = await supabase
+            const { data, error } = await dbClient
                 .from('clients')
                 .select('*')
                 .order('created_at', { ascending: false });
@@ -480,8 +480,8 @@
                 is_active: true
             };
 
-            if (supabase) {
-                const { error } = await supabase.from('clients').insert([newClient]);
+            if (dbClient) {
+                const { error } = await dbClient.from('clients').insert([newClient]);
                 if (error) return alert('Error al guardar: ' + error.message);
                 showToast('✅ Cliente guardado en la nube');
                 fetchClients();
@@ -505,8 +505,8 @@
             
             const newExpiry = baseDate.toISOString();
 
-            if (supabase) {
-                const { error } = await supabase
+            if (dbClient) {
+                const { error } = await dbClient
                     .from('clients')
                     .update({ expiry_date: newExpiry })
                     .eq('id', client.id);
@@ -536,8 +536,8 @@
                 newExpiry = nextMonth.toISOString();
             }
 
-            if (supabase) {
-                await supabase.from('clients').update({ expiry_date: newExpiry }).eq('id', client.id);
+            if (dbClient) {
+                await dbClient.from('clients').update({ expiry_date: newExpiry }).eq('id', client.id);
                 fetchClients();
             } else {
                 clients[index].expiry_date = newExpiry;
@@ -550,8 +550,8 @@
             if (!confirm('¿Seguro que quieres eliminar este cliente?')) return;
             const client = clients[index];
 
-            if (supabase) {
-                await supabase.from('clients').delete().eq('id', client.id);
+            if (dbClient) {
+                await dbClient.from('clients').delete().eq('id', client.id);
                 fetchClients();
             } else {
                 clients.splice(index, 1);
