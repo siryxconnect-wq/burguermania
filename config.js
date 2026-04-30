@@ -1,22 +1,574 @@
-/**
- * SiryX Connect — Licencia del cliente
- * ─────────────────────────────────────
- * INSTRUCCIONES:
- * 1. Abre el keygen
- * 2. Registra el cliente con su ID
- * 3. Genera la clave con las fechas
- * 4. Pon el ID y la clave abajo
- * 5. Sube a GitHub
- *
- * RENOVAR: nueva clave → actualiza gymKey → sube
- * SUSPENDER: borra gymKey → sube
- * ─────────────────────────────────────
- * NOTA: La clave de Groq (IA) la configura
- * cada dueño desde ⚙️ dentro de la app.
- * ─────────────────────────────────────
- */
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SiryX Admin Center | Control de Licencias</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <!-- Supabase JS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --bg: #050608;
+            --sidebar: #0a0c12;
+            --card-bg: rgba(18, 20, 28, 0.6);
+            --border: rgba(255, 255, 255, 0.05);
+            --border-bright: rgba(255, 255, 255, 0.12);
+            --accent: #4f46e5;
+            --accent-glow: rgba(79, 70, 229, 0.3);
+            --azure: #0ea5e9;
+            --green: #10b981;
+            --red: #ef4444;
+            --orange: #f59e0b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass: blur(20px);
+        }
 
-window.SIRYX_CONFIG = {
-  gymId:  'burger_mania',   // ID del cliente (mismo que en el keygen)
-  gymKey: '0FVH-0FWB-6589',   // Clave XXXX-XXXX-XXXX del keygen
-};
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        body {
+            background-color: var(--bg);
+            background-image: 
+                radial-gradient(circle at 0% 0%, rgba(79, 70, 229, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 100% 100%, rgba(14, 165, 233, 0.08) 0%, transparent 40%);
+            color: var(--text);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* ══ SIDEBAR ══ */
+        aside {
+            width: 280px;
+            background: var(--sidebar);
+            border-right: 1px solid var(--border);
+            padding: 32px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            z-index: 100;
+        }
+        .logo {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #fff;
+        }
+        .logo-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--accent);
+            border-radius: 3px;
+            box-shadow: 0 0 15px var(--accent);
+        }
+        
+        .nav-group { display: flex; flex-direction: column; gap: 6px; }
+        .nav-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; padding-left: 12px; }
+        .nav-item {
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .nav-item:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.03);
+            color: #fff;
+            padding-left: 20px;
+        }
+
+        /* ══ MAIN ══ */
+        main { flex: 1; padding: 48px; max-width: 1400px; margin: 0 auto; width: 100%; position: relative; }
+        
+        header { 
+            margin-bottom: 48px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-end;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+        .header-info h1 { font-size: 36px; font-weight: 800; letter-spacing: -1px; margin-bottom: 6px; }
+        .header-info p { color: var(--text-muted); font-size: 15px; }
+
+        /* ══ STATS ══ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 32px;
+            backdrop-filter: var(--glass);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--border-bright);
+            background: rgba(25, 28, 38, 0.8);
+        }
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.02) 100%);
+            pointer-events: none;
+        }
+        .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; display: block; }
+        .stat-value { font-size: 34px; font-weight: 800; color: #fff; font-family: 'Share Tech Mono', monospace; }
+
+        /* ══ TABLE ══ */
+        .table-wrap {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            backdrop-filter: var(--glass);
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            text-align: left;
+            padding: 20px 32px;
+            background: rgba(255,255,255,0.02);
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid var(--border);
+        }
+        td { padding: 24px 32px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+
+        .client-info .name { font-weight: 700; font-size: 16px; color: #fff; margin-bottom: 4px; display: block; }
+        .client-info .id { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--text-muted); background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px; }
+
+        .badge {
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
+        .status-active { background: rgba(16, 185, 129, 0.1); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.2); }
+        .status-active::before { background: var(--green); box-shadow: 0 0 10px var(--green); }
+        .status-expired { background: rgba(239, 68, 68, 0.1); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.2); }
+        .status-expired::before { background: var(--red); box-shadow: 0 0 10px var(--red); }
+        .status-pending { background: rgba(245, 158, 11, 0.1); color: var(--orange); border: 1px solid rgba(245, 158, 11, 0.2); }
+        .status-pending::before { background: var(--orange); box-shadow: 0 0 10px var(--orange); }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 14px;
+            border: none;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--accent), var(--azure)); 
+            color: #fff; 
+            box-shadow: 0 10px 25px var(--accent-glow); 
+        }
+        .btn-primary:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 15px 35px var(--accent-glow);
+            filter: brightness(1.1);
+        }
+        .btn-outline { 
+            background: rgba(255,255,255,0.03); 
+            border: 1px solid var(--border); 
+            color: var(--text); 
+        }
+        .btn-outline:hover { 
+            background: rgba(255,255,255,0.08); 
+            border-color: var(--border-bright);
+        }
+        .btn-sm { padding: 8px 14px; font-size: 11px; border-radius: 10px; }
+
+        .actions { display: flex; gap: 10px; }
+
+        /* ══ MODAL ══ */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px);
+            display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: #0f1118;
+            border: 1px solid var(--border-bright);
+            border-radius: 32px;
+            width: 100%; max-width: 480px;
+            padding: 40px;
+            display: flex; flex-direction: column; gap: 28px;
+            box-shadow: 0 30px 100px rgba(0,0,0,0.8);
+            animation: modalIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes modalIn { from { opacity:0; transform: scale(0.9) translateY(30px); } to { opacity:1; transform: scale(1) translateY(0); } }
+        
+        .field { display: flex; flex-direction: column; gap: 10px; }
+        .field label { font-size: 12px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        input {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            padding: 16px;
+            border-radius: 16px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.2s;
+        }
+        input:focus { border-color: var(--accent); background: rgba(255,255,255,0.05); }
+
+        #toast {
+            position: fixed; bottom: 32px; right: 32px;
+            background: rgba(255,255,255,0.95); color: #000;
+            padding: 16px 28px; border-radius: 18px;
+            font-weight: 700; font-size: 14px; z-index: 2000;
+            transform: translateY(100px); opacity: 0; transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        #toast.show { transform: translateY(0); opacity: 1; }
+    </style>
+</head>
+<body>
+    <aside>
+        <div class="logo"><div class="logo-dot"></div> SiryX <span>Admin</span></div>
+        <div class="nav-group">
+            <span class="nav-label">Gestión</span>
+            <a href="#" class="nav-item active">Restaurantes</a>
+            <a href="#" class="nav-item">Suscripciones</a>
+            <a href="#" class="nav-item">Estadísticas</a>
+        </div>
+        <div class="nav-group" style="margin-top: auto;">
+            <span class="nav-label">Sistema</span>
+            <a href="#" class="nav-item">Configuración</a>
+            <a href="#" class="nav-item">Soporte</a>
+        </div>
+    </aside>
+
+    <main>
+        <header>
+            <div class="header-info">
+                <h1>Panel de Licencias</h1>
+                <p>Monitorea y gestiona el acceso de tus clientes en tiempo real.</p>
+            </div>
+            <button class="btn btn-primary" onclick="openModal()">
+                <span>+</span> Registrar Nuevo Local
+            </button>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-label">Locales Activos</span>
+                <div class="stat-value" id="statActive">0</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Por Vencer</span>
+                <div class="stat-value" id="statPending" style="color: var(--orange);">0</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Facturación Mensual</span>
+                <div class="stat-value" id="statRevenue">$0</div>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Restaurante</th>
+                        <th>Estado de Licencia</th>
+                        <th>Vencimiento</th>
+                        <th>Plan Mensual</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="clientTableBody">
+                    <!-- JS carga contenido -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2 style="font-size: 24px; font-weight:800;">Nuevo Cliente</h2>
+                <button onclick="closeModal()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:20px;">✕</button>
+            </div>
+            <div class="field">
+                <label>Nombre del Restaurante</label>
+                <input type="text" id="inputName" placeholder="Ej: Pizzería Di Roma">
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                <div class="field">
+                    <label>Precio Mensual</label>
+                    <input type="number" id="inputPrice" value="50000">
+                </div>
+                <div class="field">
+                    <label>Días Iniciales</label>
+                    <input type="number" id="inputDays" value="30">
+                </div>
+            </div>
+            <button class="btn btn-primary" style="justify-content:center; padding:18px;" onclick="addClient()">
+                Guardar y Activar Local
+            </button>
+        </div>
+    </div>
+
+    <div id="toast">Acción realizada con éxito</div>
+
+    <script>
+        // CONFIGURACIÓN SUPABASE - Reemplaza con tus llaves reales
+        const SUPABASE_URL = 'https://TU_PROYECTO.supabase.co';
+        const SUPABASE_KEY = 'TU_ANON_KEY_AQUÍ';
+
+        let supabase = null;
+        if (SUPABASE_URL.includes('TU_PROYECTO')) {
+            console.warn('⚠️ Falta configurar las llaves de Supabase en admin.html');
+        } else {
+            supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        }
+
+        let clients = [];
+
+        async function fetchClients() {
+            if (!supabase) return loadMockData();
+            
+            const { data, error } = await supabase
+                .from('clients')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Error fetching:', error);
+                showToast('❌ Error al conectar con la nube');
+                return;
+            }
+            clients = data;
+            render();
+        }
+
+        function loadMockData() {
+            clients = JSON.parse(localStorage.getItem('siryx_admin_clients') || '[]');
+            if (clients.length === 0) {
+                clients = [
+                    { id: 'RX102', name: 'Demo: Hamburguesas El Corral', price: 45000, expiry_date: new Date(Date.now() + 86400000 * 15).toISOString() },
+                    { id: 'RX405', name: 'Demo: Pizzería Napolitana', price: 55000, expiry_date: new Date(Date.now() + 86400000 * 3).toISOString() }
+                ];
+            }
+            render();
+        }
+
+        function render() {
+            const body = document.getElementById('clientTableBody');
+            body.innerHTML = '';
+            
+            let activeCount = 0;
+            let pendingCount = 0;
+            let revenue = 0;
+            const now = new Date();
+
+            clients.forEach((c, index) => {
+                const expiry = new Date(c.expiry_date);
+                const diffDays = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+                
+                let statusClass = 'status-active';
+                let statusText = 'Activo';
+
+                if (diffDays <= 0) {
+                    statusClass = 'status-expired';
+                    statusText = 'Vencido';
+                } else if (diffDays <= 7) {
+                    statusClass = 'status-pending';
+                    statusText = 'Por Vencer';
+                    pendingCount++;
+                }
+
+                if (diffDays > 0) {
+                    activeCount++;
+                    revenue += parseFloat(c.price || 0);
+                }
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <div class="client-info">
+                            <span class="client-name">${c.name}</span>
+                            <span class="client-id">ID: ${c.id}</span>
+                        </div>
+                    </td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    <td class="date-cell">${expiry.toLocaleDateString()}</td>
+                    <td class="date-cell">$${new Intl.NumberFormat().format(c.price)}</td>
+                    <td>
+                        <div class="actions-cell">
+                            <button class="btn btn-sm btn-outline" onclick="extendLicense(${index})">➕ 30 días</button>
+                            <button class="btn btn-sm btn-outline" onclick="toggleStatus(${index})" style="color: ${diffDays > 0 ? 'var(--red)' : 'var(--green)'};">
+                                ${diffDays > 0 ? '🚫 Bloquear' : '🔓 Activar'}
+                            </button>
+                            <button class="btn btn-sm btn-outline" onclick="deleteClient(${index})">🗑️</button>
+                        </div>
+                    </td>
+                `;
+                body.appendChild(row);
+            });
+
+            document.getElementById('statActive').textContent = activeCount;
+            document.getElementById('statPending').textContent = pendingCount;
+            document.getElementById('statRevenue').textContent = '$' + new Intl.NumberFormat().format(revenue);
+            
+            if (clients.length === 0) {
+                body.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 40px;">No hay clientes en la nube.</td></tr>';
+            }
+        }
+
+        function openModal() { document.getElementById('modalOverlay').classList.add('open'); }
+        function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+
+        async function addClient() {
+            const name = document.getElementById('inputName').value.trim();
+            const price = document.getElementById('inputPrice').value;
+            const days = parseInt(document.getElementById('inputDays').value);
+
+            if (!name) return alert('Ingresa un nombre');
+
+            const expiry = new Date();
+            expiry.setDate(expiry.getDate() + days);
+
+            const newClient = {
+                id: 'RX' + Math.floor(100 + Math.random() * 899),
+                name: name,
+                price: parseFloat(price),
+                expiry_date: expiry.toISOString(),
+                is_active: true
+            };
+
+            if (supabase) {
+                const { error } = await supabase.from('clients').insert([newClient]);
+                if (error) return alert('Error al guardar: ' + error.message);
+                showToast('✅ Cliente guardado en la nube');
+                fetchClients();
+            } else {
+                clients.push(newClient);
+                localStorage.setItem('siryx_admin_clients', JSON.stringify(clients));
+                render();
+                showToast('✅ Guardado local (Modo Demo)');
+            }
+
+            closeModal();
+            document.getElementById('inputName').value = '';
+        }
+
+        async function extendLicense(index) {
+            const client = clients[index];
+            const current = new Date(client.expiry_date);
+            const now = new Date();
+            const baseDate = current > now ? current : now;
+            baseDate.setDate(baseDate.getDate() + 30);
+            
+            const newExpiry = baseDate.toISOString();
+
+            if (supabase) {
+                const { error } = await supabase
+                    .from('clients')
+                    .update({ expiry_date: newExpiry })
+                    .eq('id', client.id);
+                if (error) return alert('Error: ' + error.message);
+                fetchClients();
+            } else {
+                clients[index].expiry_date = newExpiry;
+                localStorage.setItem('siryx_admin_clients', JSON.stringify(clients));
+                render();
+            }
+            showToast('📅 Licencia extendida 30 días');
+        }
+
+        async function toggleStatus(index) {
+            const client = clients[index];
+            const now = new Date();
+            const expiry = new Date(client.expiry_date);
+            let newExpiry;
+            
+            if (expiry > now) {
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                newExpiry = yesterday.toISOString();
+            } else {
+                const nextMonth = new Date();
+                nextMonth.setDate(nextMonth.getDate() + 30);
+                newExpiry = nextMonth.toISOString();
+            }
+
+            if (supabase) {
+                await supabase.from('clients').update({ expiry_date: newExpiry }).eq('id', client.id);
+                fetchClients();
+            } else {
+                clients[index].expiry_date = newExpiry;
+                localStorage.setItem('siryx_admin_clients', JSON.stringify(clients));
+                render();
+            }
+        }
+
+        async function deleteClient(index) {
+            if (!confirm('¿Seguro que quieres eliminar este cliente?')) return;
+            const client = clients[index];
+
+            if (supabase) {
+                await supabase.from('clients').delete().eq('id', client.id);
+                fetchClients();
+            } else {
+                clients.splice(index, 1);
+                localStorage.setItem('siryx_admin_clients', JSON.stringify(clients));
+                render();
+            }
+            showToast('🗑️ Cliente eliminado');
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // Inicio
+        fetchClients();
+    </script>
+</body>
+</html>
