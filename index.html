@@ -2333,9 +2333,10 @@ function verificarLicencia(){
     activadoEl: cfg.licencia?.activadoEl || now.toISOString()
   };
   localStorage.setItem('siryx_cfg', JSON.stringify(cfg));
-  document.getElementById('activationScreen').classList.add('hidden');
+  const overlay = document.getElementById('activationOverlay');
+  if(overlay) overlay.style.display = 'none';
   iniciarApp();
-  toast(\`✅ Licencia activa hasta el \${fechaFin.toLocaleDateString('es-CO')}\`);
+  toast(`✅ Licencia activa hasta el ${fechaFin.toLocaleDateString('es-CO')}`);
 }
 
 // Enter en el input activa
@@ -2406,29 +2407,35 @@ applyTheme();
 mostrarEstadoLicencia();
 
 if(checkLicencia()){
-  document.getElementById('activationScreen').classList.add('hidden');
+  const overlay = document.getElementById('activationOverlay');
+  if(overlay) overlay.style.display = 'none';
   iniciarApp();
 } else {
-  // Mostrar pantalla de activación
   mostrarEstadoLicencia();
 }
 
 </script>
     <!-- RESTO DE LA APP -->
-    <div id="activationOverlay">
-        <div class="activation-card">
-            <div class="activation-logo">SiryX<span>.</span></div>
-            <div class="activation-status" id="activationStatus">Bienvenido a la plataforma SiryX. Para comenzar, ingresa el ID de restaurante proporcionado por tu distribuidor.</div>
-            <div class="activation-field">
-                <label>ID de Restaurante</label>
-                <input type="text" id="activationInput" class="activation-input" placeholder="RX-000" maxlength="8">
-                <div id="activationError" class="activation-error">ID no válido o licencia expirada.</div>
+    <div id="activationOverlay" style="position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(20px);">
+        <div class="activation-card" style="background: var(--card-bg); border: 1px solid var(--border-bright); padding: 40px; border-radius: 32px; width: 100%; max-width: 400px; text-align: center; backdrop-filter: blur(20px); box-shadow: var(--card-shadow);">
+            <div class="activation-logo" style="font-size: 32px; font-weight: 800; margin-bottom: 20px;">SiryX<span style="color: var(--accent);">.</span></div>
+            <div class="activation-status" id="actEstado" style="font-size: 13px; color: var(--muted); margin-bottom: 30px; line-height: 1.6;">Ingresa los datos de tu licencia para desbloquear el sistema Elite.</div>
+            
+            <div class="activation-field" style="text-align: left; margin-bottom: 20px;">
+                <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; color: var(--muted); display: block; margin-bottom: 8px;">ID de Restaurante</label>
+                <input type="text" id="actClienteId" class="activation-input" placeholder="Ej: burguer_01" style="width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 14px; border-radius: 12px; color: #fff; outline: none;">
             </div>
-            <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 14px;" id="btnActivate" onclick="validateLicense()">
-                <span class="spinner" id="activationSpinner" style="display: none;"></span>
-                Activar Licencia
+
+            <div class="activation-field" style="text-align: left; margin-bottom: 30px;">
+                <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; color: var(--muted); display: block; margin-bottom: 8px;">Clave de Activación</label>
+                <input type="text" id="actInput" class="activation-input" placeholder="XXXX-XXXX-XXXX" maxlength="14" style="width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 14px; border-radius: 12px; color: #fff; outline: none; font-family: monospace; letter-spacing: 2px;">
+                <div id="actErr" style="color: var(--red); font-size: 12px; margin-top: 8px; font-weight: 600;"></div>
+            </div>
+
+            <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 16px; font-size: 15px; border-radius: 14px;" onclick="verificarLicencia()">
+                Activar Sistema Elite
             </button>
-            <div style="margin-top: 20px; font-size: 10px; color: var(--muted);">© 2026 SiryX Comandas · Sistema Protegido</div>
+            <div style="margin-top: 24px; font-size: 10px; color: var(--muted); letter-spacing: 1px;">© 2026 SiryX Connect · SaaS Edition</div>
         </div>
     </div>
 </body>
