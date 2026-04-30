@@ -8,12 +8,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-/* 
- * SiryX Comandas — Propiedad de SiryX Connect
- * Desarrollado por: Arturo Rosas — WhatsApp 320 369 4094
- * Build: 202604270333
- * © 2025 SiryX Connect. Todos los derechos reservados.
- */
 /* ══ TEMAS ══ */
 [data-theme="dark"]{
   --bg:#0d0f14;--s1:#161820;--s2:#1e2029;--s3:#252733;
@@ -288,15 +282,39 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
 .toast.show{transform:translateX(-50%) translateY(0)}
 
 /* ══ PRINT ══ */
+
+/* ══ MODAL PAGO ══ */
+.pago-metodo{display:flex;flex-direction:column;gap:6px}
+.pago-row{display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg2);border-radius:6px;border:1px solid var(--border)}
+.pago-row.activo{border-color:var(--accent);background:rgba(59,139,255,.08)}
+.pago-icon{font-size:18px;width:28px;text-align:center;flex-shrink:0}
+.pago-label{flex:1;font-size:13px;font-weight:600}
+.pago-input{width:110px;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:5px 8px;border-radius:5px;font-size:13px;font-family:var(--mono);text-align:right}
+.pago-input:focus{outline:none;border-color:var(--accent)}
+.pago-total-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--border);margin-top:4px}
+.pago-pendiente{font-size:12px;font-family:var(--mono)}
+.pago-pendiente.ok{color:var(--green)}.pago-pendiente.mal{color:var(--red)}
+
+
+/* ══ ETIQUETAS DE ESTADO COMANDA ══ */
+.comanda-tag{display:inline-block;font-size:9px;font-weight:700;font-family:var(--mono);letter-spacing:.5px;padding:2px 6px;border-radius:3px;text-transform:uppercase;margin-left:6px}
+.tag-editada{background:rgba(255,140,0,.2);color:#ff8c00;border:1px solid #ff8c00}
+.tag-fusionada{background:rgba(147,51,234,.2);color:#9333ea;border:1px solid #9333ea}
+.tag-parcial{background:rgba(59,130,246,.2);color:#3b82f6;border:1px solid #3b82f6}
+.tag-pagada{background:rgba(34,197,94,.2);color:#22c55e;border:1px solid #22c55e}
+.tag-pendiente{background:rgba(255,140,0,.15);color:#ff8c00;border:1px solid rgba(255,140,0,.4)}
+.fusion-trace{background:var(--bg2);border:1px solid var(--border);border-left:3px solid #9333ea;border-radius:4px;padding:8px 10px;font-size:11px;color:var(--muted);margin-top:6px}
+.fusion-trace b{color:#9333ea}
+
 @media print{
   @page{margin:0;size:58mm auto}
   html,body{height:auto!important;overflow:visible!important}
   body>*:not(#print-frame){display:none!important}
   #print-frame{display:block!important;position:static!important;background:#fff;width:58mm}
-  #print-frame .ticket-print{width:58mm;font-family:'Courier New',Courier,monospace;font-size:9.5pt;line-height:1.6;padding:2mm 1.5mm;color:#000;page-break-after:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #print-frame .ticket-print{width:58mm;font-family:'Courier New',Courier,monospace;font-size:12pt;line-height:1.7;padding:3mm 2mm;color:#000;page-break-after:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   #print-frame .ticket-print *{font-family:'Courier New',Courier,monospace!important;color:#000!important;background:none!important;-webkit-font-smoothing:none;font-smooth:never;font-weight:700!important}
-  #print-frame .ticket-print .t-logo{font-size:13pt!important;font-weight:700!important;letter-spacing:1px}
-  #print-frame .ticket-print .t-orden{font-size:11pt!important;font-weight:700!important}
+  #print-frame .ticket-print .t-logo{font-size:15pt!important;font-weight:700!important;letter-spacing:1px}
+  #print-frame .ticket-print .t-orden{font-size:14pt!important;font-weight:700!important}
   .t-line{border-top:1px dashed #999;margin:3px 0}
   .t-double{border-top:2px solid #000;margin:3px 0}
   #print-frame .ticket-print img{max-width:50mm;height:auto}
@@ -319,19 +337,6 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
 }
 </style>
 </head>
-<script>
-(function(){
-  const PERMITIDOS=['orix-servicios.github.io','localhost','127.0.0.1'];
-  const host=window.location.hostname||'localhost';
-  const esLocal=window.location.protocol==='file:'||host==='localhost'||host==='127.0.0.1';
-  if(!esLocal&&!PERMITIDOS.some(d=>host.includes(d))){
-    document.body.innerHTML=`<div style="position:fixed;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;font-family:sans-serif;color:#fff;text-align:center;padding:20px"><div style="font-size:48px">🔒</div><div style="font-size:22px;color:#3b8bff;letter-spacing:2px">ACCESO BLOQUEADO</div><div style="font-size:13px;color:#555;max-width:300px">Esta aplicación no está autorizada en este dominio.</div><div style="font-size:12px;color:#333;margin-top:8px">SiryX Connect — WhatsApp 320 369 4094</div></div>`;
-    throw new Error('Dominio no autorizado');
-  }
-})();
-</script>
-
-<script src="config.js" onerror="console.warn('config.js no encontrado')"></script>
 <body>
 
 <!-- ACTIVACIÓN -->
@@ -384,7 +389,7 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
 <div class="tabs-nav">
   <button class="tab-btn active" onclick="switchTab('comanda',this)">🧾 Comanda</button>
   <button class="tab-btn" onclick="switchTab('historial',this)">📋 Historial <span class="tab-badge" id="histBadge">0</span></button>
-  <button class="tab-btn" onclick="switchTab('dashboard',this)">📊 Ventas</button>
+  <button class="tab-btn" id="tabVentas" onclick="accederDashboard(this)">📊 Ventas</button>
 </div>
 
 <main>
@@ -458,7 +463,7 @@ Sin precios también funciona:
           4. Pega en PrintHand → selecciona impresora → Imprimir
         </div>
         <div class="print-row">
-          <button class="btn btn-secondary" id="btnGuardar" onclick="guardarComanda()" disabled style="flex:1;font-size:11px">💾 Guardar en historial</button>
+          <button class="btn btn-secondary" id="btnGuardar" onclick="guardarComanda()" disabled style="flex:1;font-size:11px">💾 Enviar a cocina</button>
         </div>
       </div>
     </div>
@@ -474,6 +479,7 @@ Sin precios también funciona:
 
 <!-- ══ TAB DASHBOARD ══ -->
 <div class="tab-content" id="tab-dashboard">
+  <div id="dashResumenPagos" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;margin:12px 12px 0"></div>
   <div class="dash-layout">
     <div class="dash-grid">
       <div class="dash-card blue"><div class="dash-icon">📅</div><div class="dash-label">Ventas Hoy</div><div class="dash-value" id="dVentasHoy">$0</div><div class="dash-sub" id="dOrdHoy">0 órdenes</div></div>
@@ -523,7 +529,7 @@ Sin precios también funciona:
     <div class="modal-title">⚙ Configuración</div>
     <div class="modal-field">
       <label>🔑 API Key de Groq <span style="color:var(--muted);font-weight:400">(gratis en console.groq.com)</span></label>
-      <input id="cfgGroqKey" type="password" placeholder="CARGADA_DESDE_CONFIG_JS" autocomplete="off">
+      <input id="cfgGroqKey" type="password" placeholder="gsk_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
       <div style="font-size:10px;color:var(--muted);margin-top:3px">1. Entra a <b style="color:var(--accent)">console.groq.com</b> → crea cuenta gratis → API Keys → Create Key<br>2. Pega aquí y guarda.</div>
     </div>
     <div style="border-top:1px solid var(--border);margin:2px 0"></div>
@@ -630,97 +636,961 @@ Sin precios también funciona:
   </div>
 </div>
 
+<!-- MODAL REGISTRO DE PAGO -->
+<div class="modal-overlay" id="modalPago" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:600;align-items:center;justify-content:center;padding:16px">
+  <div style="background:var(--bg);border:1px solid var(--border);border-top:3px solid var(--accent);border-radius:10px;padding:20px;width:100%;max-width:380px;display:flex;flex-direction:column;gap:14px">
+    <div style="font-family:var(--display);font-size:18px;letter-spacing:1px;display:flex;align-items:center;justify-content:space-between">
+      💳 Registrar Pago
+      <button onclick="cerrarModalPago()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer">✕</button>
+    </div>
+    <div style="font-size:12px;color:var(--muted)" id="pagoComandaInfo">Comanda #0000</div>
+
+    <!-- TOTAL -->
+    <div style="background:var(--bg2);border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:13px;color:var(--muted)">Total a pagar</span>
+      <span style="font-family:var(--mono);font-size:20px;font-weight:700;color:var(--accent)" id="pagoTotalLabel">$0</span>
+    </div>
+
+    <!-- MÉTODOS DE PAGO -->
+    <div class="pago-metodo" id="pagoMetodos">
+      <div class="pago-row" id="rowEfectivo">
+        <span class="pago-icon">💵</span>
+        <span class="pago-label">Efectivo</span>
+        <input class="pago-input" id="pagoEfectivo" type="number" placeholder="0" oninput="calcularPago()">
+      </div>
+      <div class="pago-row" id="rowNequi">
+        <span class="pago-icon">🟣</span>
+        <span class="pago-label">Nequi</span>
+        <input class="pago-input" id="pagoNequi" type="number" placeholder="0" oninput="calcularPago()">
+      </div>
+      <div class="pago-row" id="rowDaviplata">
+        <span class="pago-icon">🔴</span>
+        <span class="pago-label">Daviplata</span>
+        <input class="pago-input" id="pagoDaviplata" type="number" placeholder="0" oninput="calcularPago()">
+      </div>
+      <div class="pago-row" id="rowBreb">
+        <span class="pago-icon">🔵</span>
+        <span class="pago-label">Bre-B</span>
+        <input class="pago-input" id="pagoBreb" type="number" placeholder="0" oninput="calcularPago()">
+      </div>
+      <div class="pago-row" id="rowTarjeta">
+        <span class="pago-icon">💳</span>
+        <span class="pago-label">Tarjeta</span>
+        <input class="pago-input" id="pagoTarjeta" type="number" placeholder="0" oninput="calcularPago()">
+      </div>
+      <div class="pago-row" id="rowOtro">
+        <span class="pago-icon">💸</span>
+        <span class="pago-label">Otro</span>
+        <input class="pago-input" id="pagoOtro" type="number" placeholder="0" oninput="calcularPago()">
+      </div>
+    </div>
+
+    <!-- RESUMEN -->
+    <div class="pago-total-row">
+      <div>
+        <div style="font-size:12px;color:var(--muted)">Total ingresado</div>
+        <div style="font-family:var(--mono);font-size:16px;font-weight:700" id="pagoIngresado">$0</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:12px;color:var(--muted)">Pendiente / Cambio</div>
+        <div class="pago-pendiente" id="pagoPendiente">$0</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px">
+      <button onclick="cerrarModalPago()" style="flex:1;padding:10px;background:none;border:1px solid var(--border);color:var(--text);border-radius:7px;cursor:pointer;font-size:13px">Cancelar</button>
+      <button onclick="confirmarPago()" style="flex:2;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:7px;cursor:pointer;font-size:13px;font-weight:700">✅ Guardar pago</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR COMANDA -->
+<div class="modal-overlay" id="modalEditar" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:600;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto">
+  <div style="background:var(--bg);border:1px solid var(--border);border-top:3px solid var(--accent);border-radius:10px;padding:20px;width:100%;max-width:460px;display:flex;flex-direction:column;gap:12px;margin-top:20px">
+    <div style="font-family:var(--display);font-size:18px;letter-spacing:1px;display:flex;align-items:center;justify-content:space-between">
+      ✏️ Editar Comanda
+      <button onclick="cerrarModalEditar()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer">✕</button>
+    </div>
+    <div style="font-size:12px;color:var(--muted)" id="editarInfo"></div>
+
+    <!-- ÍTEMS ACTUALES -->
+    <div>
+      <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Ítems actuales</div>
+      <div id="editarItems" style="display:flex;flex-direction:column;gap:4px"></div>
+    </div>
+
+    <!-- AGREGAR ÍTEM -->
+    <div style="border-top:1px solid var(--border);padding-top:10px">
+      <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Agregar ítem</div>
+      <div style="display:flex;gap:6px">
+        <input class="meta-input" id="editarNuevoItem" placeholder="Ej: 1 Hamburguesa + papas" style="flex:1;font-size:12px">
+        <input class="meta-input" id="editarNuevoPrecio" type="number" placeholder="Precio" style="width:90px;font-size:12px">
+        <button onclick="agregarItemEditar()" style="background:var(--accent);color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:700">+</button>
+      </div>
+    </div>
+
+    <!-- NOTAS -->
+    <div class="f-field">
+      <label style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px">Notas adicionales</label>
+      <textarea id="editarNotas" style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:8px;border-radius:6px;font-size:12px;resize:none;min-height:60px;font-family:var(--sans)" placeholder="Ej: Sin cebolla, extra salsa..."></textarea>
+    </div>
+
+    <div style="display:flex;gap:8px">
+      <button onclick="cerrarModalEditar()" style="flex:1;padding:10px;background:none;border:1px solid var(--border);color:var(--text);border-radius:7px;cursor:pointer">Cancelar</button>
+      <button onclick="guardarEdicion()" style="flex:2;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:7px;cursor:pointer;font-weight:700">💾 Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FUSIONAR COMANDAS -->
+<div class="modal-overlay" id="modalFusionar" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:600;align-items:center;justify-content:center;padding:16px">
+  <div style="background:var(--bg);border:1px solid var(--border);border-top:3px solid #ff8c00;border-radius:10px;padding:20px;width:100%;max-width:420px;display:flex;flex-direction:column;gap:12px">
+    <div style="font-family:var(--display);font-size:18px;letter-spacing:1px;display:flex;align-items:center;justify-content:space-between">
+      🔗 Fusionar Comandas
+      <button onclick="cerrarModalFusionar()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer">✕</button>
+    </div>
+    <div style="font-size:12px;color:var(--muted)">Selecciona las comandas a unir en una sola cuenta para el pago</div>
+    <div id="fusionarLista" style="display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto"></div>
+    <div style="background:var(--bg2);border-radius:8px;padding:10px;display:flex;justify-content:space-between">
+      <span style="font-size:13px;color:var(--muted)">Total fusionado</span>
+      <span style="font-family:var(--mono);font-size:18px;font-weight:700;color:#ff8c00" id="fusionarTotal">$0</span>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button onclick="cerrarModalFusionar()" style="flex:1;padding:10px;background:none;border:1px solid var(--border);color:var(--text);border-radius:7px;cursor:pointer">Cancelar</button>
+      <button onclick="confirmarFusion()" style="flex:2;padding:10px;background:#ff8c00;color:#fff;border:none;border-radius:7px;cursor:pointer;font-weight:700">🔗 Fusionar y pagar</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 <div id="print-frame"></div>
 
 <script>
-let comandas=JSON.parse(localStorage.getItem('siryx_comandas')||'[]');let cfg=JSON.parse(localStorage.getItem('siryx_cfg')||'{}');let ordenActual=null;let counter=parseInt(localStorage.getItem('siryx_counter')||'1');let chartSemana=null,chartHoras=null,chartComp=null;function fmt(n){return n?'$'+Number(n).toLocaleString('es-CO'):'';}
-function fmtNum(n){return'$'+Number(n||0).toLocaleString('es-CO');}
-function initSplash(){const wrap=document.getElementById('splashLogoWrap');const restoEl=document.getElementById('splashResto');if(cfg.logoData){wrap.innerHTML=`<img src="${cfg.logoData}"class="splash-logo-img">`;}
-if(cfg.resto){restoEl.textContent=cfg.resto;document.getElementById('splashTitle').style.display='none';}
-setTimeout(()=>{document.getElementById('splash').classList.add('hiding');setTimeout(()=>document.getElementById('splash').style.display='none',500);},2000);}
-function toggleTheme(){const html=document.documentElement;const isDark=html.getAttribute('data-theme')==='dark';html.setAttribute('data-theme',isDark?'light':'dark');document.getElementById('themeToggle').textContent=isDark?'🌙':'☀️';localStorage.setItem('siryx_theme',isDark?'light':'dark');if(chartSemana)renderDashboard();}
-function applyTheme(){const t=localStorage.getItem('siryx_theme')||'dark';document.documentElement.setAttribute('data-theme',t);document.getElementById('themeToggle').textContent=t==='dark'?'🌙':'☀️';}
-setInterval(()=>{const n=new Date();document.getElementById('clockDisplay').textContent=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;},1000);function toast(msg,ms=2400){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),ms);}
-function switchTab(name,btn){document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById('tab-'+name).classList.add('active');btn.classList.add('active');if(name==='historial')renderHistorial();if(name==='dashboard')renderDashboard();}
-function handleLogoUpload(e){const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=function(ev){cfg.logoData=ev.target.result;showLogoPreview(cfg.logoData);};reader.readAsDataURL(file);}
-function showLogoPreview(src){const img=document.getElementById('logoPreviewImg');const hint=document.getElementById('logoUploadHint');const btnQ=document.getElementById('btnQuitarLogo');img.src=src;img.style.display='block';hint.style.display='none';btnQ.style.display='flex';actualizarHeaderLogo();}
-function quitarLogo(){delete cfg.logoData;document.getElementById('logoPreviewImg').style.display='none';document.getElementById('logoUploadHint').style.display='block';document.getElementById('btnQuitarLogo').style.display='none';document.getElementById('headerLogoWrap').innerHTML='<div class="logo-mark">S</div>';}
-function actualizarHeaderLogo(){const wrap=document.getElementById('headerLogoWrap');if(cfg.logoData)wrap.innerHTML=`<img src="${cfg.logoData}"class="logo-img">`;else wrap.innerHTML='<div class="logo-mark">S</div>';}
-function renderQRPreview(){const link=document.getElementById('cfgQrLink').value.trim();const wrap=document.getElementById('qrPreview');wrap.innerHTML='';if(link){try{new QRCode(wrap,{text:link,width:80,height:80,colorDark:'#000',colorLight:'#fff'});}catch(e){}}}
+// ══════════════════════════════════════
+//  ESTADO
+// ══════════════════════════════════════
+let comandas = JSON.parse(localStorage.getItem('siryx_comandas')||'[]');
+let cfg = JSON.parse(localStorage.getItem('siryx_cfg')||'{}');
+let ordenActual = null;
+let counter = parseInt(localStorage.getItem('siryx_counter')||'1');
+let chartSemana=null,chartHoras=null,chartComp=null;
 
-// Licencia remota — mismo algoritmo que keygen
+function fmt(n){ return n?'$'+Number(n).toLocaleString('es-CO'):''; }
+function fmtNum(n){ return '$'+Number(n||0).toLocaleString('es-CO'); }
 
-const _RSEC='SiryX2024$Connect#';
-function _hLic(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h)^s.charCodeAt(i);return Math.abs(h);}
-function verificarLicenciaRemota(id,key){
+// ══ SPLASH ══
+function initSplash(){
+  const wrap = document.getElementById('splashLogoWrap');
+  const restoEl = document.getElementById('splashResto');
+  if(cfg.logoData){
+    wrap.innerHTML=`<img src="${cfg.logoData}" class="splash-logo-img">`;
+  }
+  if(cfg.resto){ restoEl.textContent = cfg.resto; document.getElementById('splashTitle').style.display='none'; }
+  setTimeout(()=>{
+    document.getElementById('splash').classList.add('hiding');
+    setTimeout(()=>document.getElementById('splash').style.display='none',500);
+  },2000);
+}
+
+// ══ TEMA ══
+function toggleTheme(){
+  const html=document.documentElement;
+  const isDark=html.getAttribute('data-theme')==='dark';
+  html.setAttribute('data-theme',isDark?'light':'dark');
+  document.getElementById('themeToggle').textContent=isDark?'🌙':'☀️';
+  localStorage.setItem('siryx_theme',isDark?'light':'dark');
+  // Redibujar charts con nuevo tema
+  if(chartSemana) renderDashboard();
+}
+function applyTheme(){
+  const t=localStorage.getItem('siryx_theme')||'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  document.getElementById('themeToggle').textContent=t==='dark'?'🌙':'☀️';
+}
+
+// ══ RELOJ ══
+setInterval(()=>{
+  const n=new Date();
+  document.getElementById('clockDisplay').textContent=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
+},1000);
+
+// ══ TOAST ══
+function toast(msg,ms=2400){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),ms);
+}
+
+// ══ TABS ══
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='historial') renderHistorial();
+  if(name==='dashboard') renderDashboard();
+}
+
+// ══ LOGO ══
+function handleLogoUpload(e){
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    cfg.logoData=ev.target.result;
+    showLogoPreview(cfg.logoData);
+  };
+  reader.readAsDataURL(file);
+}
+function showLogoPreview(src){
+  const img=document.getElementById('logoPreviewImg');
+  const hint=document.getElementById('logoUploadHint');
+  const btnQ=document.getElementById('btnQuitarLogo');
+  img.src=src; img.style.display='block';
+  hint.style.display='none'; btnQ.style.display='flex';
+  actualizarHeaderLogo();
+}
+function quitarLogo(){
+  delete cfg.logoData;
+  document.getElementById('logoPreviewImg').style.display='none';
+  document.getElementById('logoUploadHint').style.display='block';
+  document.getElementById('btnQuitarLogo').style.display='none';
+  document.getElementById('headerLogoWrap').innerHTML='<div class="logo-mark">S</div>';
+}
+function actualizarHeaderLogo(){
+  const wrap=document.getElementById('headerLogoWrap');
+  if(cfg.logoData) wrap.innerHTML=`<img src="${cfg.logoData}" class="logo-img">`;
+  else wrap.innerHTML='<div class="logo-mark">S</div>';
+}
+
+// ══ QR PREVIEW EN CONFIG ══
+function renderQRPreview(){
+  const link=document.getElementById('cfgQrLink').value.trim();
+  const wrap=document.getElementById('qrPreview');
+  wrap.innerHTML='';
+  if(link){
+    try{ new QRCode(wrap,{text:link,width:80,height:80,colorDark:'#000',colorLight:'#fff'}); }catch(e){}
+  }
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('cfgQrLink').addEventListener('input',renderQRPreview);
+});
+
+// ══ CONFIG ══
+function openConfig(){
+  document.getElementById('cfgGroqKey').value=cfg.groqKey||'';
+  document.getElementById('cfgResto').value=cfg.resto||'';
+  document.getElementById('cfgEslogan').value=cfg.eslogan||'';
+  document.getElementById('cfgCierre').value=cfg.cierre||'';
+  document.getElementById('cfgMesero').value=cfg.mesero||'';
+  document.getElementById('cfgQrLink').value=cfg.qrLink||'';
+  if(cfg.logoData) showLogoPreview(cfg.logoData);
+  renderQRPreview();
+  document.getElementById('modalConfig').classList.add('open');
+}
+function closeConfig(){ document.getElementById('modalConfig').classList.remove('open'); }
+function saveConfig(){
+  cfg.groqKey=document.getElementById('cfgGroqKey').value.trim();
+  cfg.resto=document.getElementById('cfgResto').value;
+  cfg.eslogan=document.getElementById('cfgEslogan').value;
+  cfg.cierre=document.getElementById('cfgCierre').value;
+  cfg.mesero=document.getElementById('cfgMesero').value;
+  cfg.qrLink=document.getElementById('cfgQrLink').value.trim();
+  localStorage.setItem('siryx_cfg',JSON.stringify(cfg));
+  if(cfg.mesero) document.getElementById('metaMesero').value=cfg.mesero;
+  actualizarHeaderLogo();
+  closeConfig(); toast('✅ Configuración guardada');
+}
+
+// ══ STATUS ══
+function showStatus(msg,type){
+  const b=document.getElementById('statusBar');
+  const ico={ok:'✅',err:'❌',info:'⏳'};
+  b.innerHTML=`${ico[type]||''} ${msg}`;
+  b.className=`status-bar ${type}`;
+}
+
+// ══ LIMPIAR ══
+function limpiarTodo(){
+  document.getElementById('pasteZone').value='';
+  document.getElementById('metaMesa').value='';
+  document.getElementById('metaNotas').value='';
+  document.getElementById('metaTipo').value='MESA';
+  if(cfg.mesero) document.getElementById('metaMesero').value=cfg.mesero;
+  else document.getElementById('metaMesero').value='';
+  ordenActual=null;
+  document.getElementById('ticketPreview').innerHTML='<div class="ticket-empty">La comanda<br>aparecerá aquí</div>';
+  document.getElementById('ticketNumLabel').textContent='#----';
+  ['btnImprimir','btnCopiarBT','btnGuardar'].forEach(id=>document.getElementById(id).disabled=true);
+  document.getElementById('statusBar').className='status-bar';
+}
+
+// ══ SONIDO TÉRMICA ══
+function playPrintSound(){
   try{
-    const p=key.trim().toUpperCase().split('-');
-    if(p.length!==3)return false;
-    const dI=parseInt(p[0],36),dF=parseInt(p[1],36),ck=p[2];
-    const seed=_RSEC+'|'+id.toLowerCase().trim()+'|'+dI+'|'+dF;
-    const exp=('000'+(_hLic(seed)%9999+1000)).slice(-4);
-    if(ck!==exp)return false;
-    const hoy=Math.floor(Date.now()/86400000);
-    return hoy>=dI&&hoy<=dF+2;
-  }catch(e){return false;}
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const dur=0.8;
+    const buf=ctx.createBuffer(1,ctx.sampleRate*dur,ctx.sampleRate);
+    const data=buf.getChannelData(0);
+    for(let i=0;i<data.length;i++){
+      const t=i/ctx.sampleRate;
+      // Motor + papel
+      data[i]=(Math.sin(2*Math.PI*180*t)*0.15 + Math.sin(2*Math.PI*240*t)*0.1 + (Math.random()*2-1)*0.06) * Math.exp(-t*3);
+    }
+    const src=ctx.createBufferSource();
+    src.buffer=buf;
+    const gain=ctx.createGain();
+    gain.gain.value=0.4;
+    src.connect(gain);gain.connect(ctx.destination);
+    src.start();
+  }catch(e){}
 }
-function mostrarBloqueoComandas(){
-  document.body.innerHTML='<div style="position:fixed;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;font-family:sans-serif;color:#fff;text-align:center;padding:20px">'
-    +'<div style="font-size:56px">🔒</div>'
-    +'<div style="font-size:22px;letter-spacing:3px;color:#3b8bff">SERVICIO SUSPENDIDO</div>'
-    +'<div style="font-size:13px;color:#555;max-width:280px;line-height:1.7">El plan de este restaurante ha vencido.</div>'
-    +'<a href="https://wa.me/573203694094" style="background:#3b8bff;color:#fff;padding:12px 24px;font-size:13px;text-decoration:none;margin-top:8px">📱 Contactar SiryX Connect</a>'
-    +'</div>';
+
+// ══ PROCESAR CON IA ══
+async function procesarPedido(){
+  const texto=document.getElementById('pasteZone').value.trim();
+  if(!texto){showStatus('Pega primero el texto del pedido','err');return;}
+  const btn=document.getElementById('btnProcesar');
+  btn.disabled=true;btn.classList.add('loading');
+  showStatus('Interpretando pedido con IA...','info');
+
+  const resto=cfg.resto||'Restaurante';
+  const mesa=document.getElementById('metaMesa').value||'';
+  const mesero=document.getElementById('metaMesero').value||'';
+  const tipo=document.getElementById('metaTipo').value;
+  const notas=document.getElementById('metaNotas').value||'';
+  const numOrden=String(counter).padStart(4,'0');
+
+  const prompt=`Eres el sistema de comandas de un restaurante colombiano. Analiza este texto de WhatsApp y extrae el pedido completo.
+
+TEXTO:
+"${texto}"
+
+Responde ÚNICAMENTE con JSON válido, sin texto adicional, sin backticks:
+{
+  "mesa": "Mesa 4",
+  "mesero": "Juan",
+  "tipo": "MESA",
+  "items": [{"qty":2,"name":"Hamburguesa Clásica","unit_price":18000,"note":"1 sin cebolla"}],
+  "tiene_precios": true,
+  "subtotal": 36000,
+  "resumen": "descripción breve"
 }
-document.addEventListener('DOMContentLoaded',()=>{document.getElementById('cfgQrLink').addEventListener('input',renderQRPreview);});function openConfig(){document.getElementById('cfgGroqKey').value=cfg.groqKey||'';document.getElementById('cfgResto').value=cfg.resto||'';document.getElementById('cfgEslogan').value=cfg.eslogan||'';document.getElementById('cfgCierre').value=cfg.cierre||'';document.getElementById('cfgMesero').value=cfg.mesero||'';document.getElementById('cfgQrLink').value=cfg.qrLink||'';if(cfg.logoData)showLogoPreview(cfg.logoData);renderQRPreview();document.getElementById('modalConfig').classList.add('open');}
-function closeConfig(){document.getElementById('modalConfig').classList.remove('open');}
-function saveConfig(){cfg.groqKey=document.getElementById('cfgGroqKey').value.trim();cfg.resto=document.getElementById('cfgResto').value;cfg.eslogan=document.getElementById('cfgEslogan').value;cfg.cierre=document.getElementById('cfgCierre').value;cfg.mesero=document.getElementById('cfgMesero').value;cfg.qrLink=document.getElementById('cfgQrLink').value.trim();localStorage.setItem('siryx_cfg',JSON.stringify(cfg));if(cfg.mesero)document.getElementById('metaMesero').value=cfg.mesero;actualizarHeaderLogo();closeConfig();toast('✅ Configuración guardada');}
-function showStatus(msg,type){const b=document.getElementById('statusBar');const ico={ok:'✅',err:'❌',info:'⏳'};b.innerHTML=`${ico[type]||''}${msg}`;b.className=`status-bar ${type}`;}
-function limpiarTodo(){document.getElementById('pasteZone').value='';document.getElementById('metaMesa').value='';document.getElementById('metaNotas').value='';document.getElementById('metaTipo').value='MESA';if(cfg.mesero)document.getElementById('metaMesero').value=cfg.mesero;else document.getElementById('metaMesero').value='';ordenActual=null;document.getElementById('ticketPreview').innerHTML='<div class="ticket-empty">La comanda<br>aparecerá aquí</div>';document.getElementById('ticketNumLabel').textContent='#----';['btnImprimir','btnCopiarBT','btnGuardar'].forEach(id=>document.getElementById(id).disabled=true);document.getElementById('statusBar').className='status-bar';}
-function playPrintSound(){try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const dur=0.8;const buf=ctx.createBuffer(1,ctx.sampleRate*dur,ctx.sampleRate);const data=buf.getChannelData(0);for(let i=0;i<data.length;i++){const t=i/ctx.sampleRate;data[i]=(Math.sin(2*Math.PI*180*t)*0.15+Math.sin(2*Math.PI*240*t)*0.1+(Math.random()*2-1)*0.06)*Math.exp(-t*3);}
-const src=ctx.createBufferSource();src.buffer=buf;const gain=ctx.createGain();gain.gain.value=0.4;src.connect(gain);gain.connect(ctx.destination);src.start();}catch(e){}}
-async function procesarPedido(){const texto=document.getElementById('pasteZone').value.trim();if(!texto){showStatus('Pega primero el texto del pedido','err');return;}
-const btn=document.getElementById('btnProcesar');btn.disabled=true;btn.classList.add('loading');showStatus('Interpretando pedido con IA...','info');const resto=cfg.resto||'Restaurante';const mesa=document.getElementById('metaMesa').value||'';const mesero=document.getElementById('metaMesero').value||'';const tipo=document.getElementById('metaTipo').value;const notas=document.getElementById('metaNotas').value||'';const numOrden=String(counter).padStart(4,'0');const prompt=`Eres el sistema de comandas de un restaurante colombiano.Analiza este texto de WhatsApp y extrae el pedido completo.TEXTO:"${texto}"
-Responde ÚNICAMENTE con JSON válido,sin texto adicional,sin backticks:{"mesa":"Mesa 4","mesero":"Juan","tipo":"MESA","items":[{"qty":2,"name":"Hamburguesa Clásica","unit_price":18000,"note":"1 sin cebolla"}],"tiene_precios":true,"subtotal":36000,"resumen":"descripción breve"}
-Reglas mesa/mesero/tipo:-mesa:"mesa 3","la 5","M4"→"Mesa 3".Nombre de cliente → úsalo.Sin info →""
--mesero:si mencionan quien toma el pedido → extráelo.Sin info →""
--tipo:MESA/DOMICILIO/PARA LLEVAR/BARRA según palabras clave
-Reglas ítems:-unit_price:número entero COP sin puntos.Sin precio → 0
--note:modificaciones o""
--tiene_precios:true si hay AL MENOS UN precio
--subtotal:suma qty*unit_price
--Agrupa ítems idénticos
--Precios:18000,18.000,$18000,18k,18 mil,c/u`;try{// Verificar licencia remota del restaurante
-// Verificación de licencia remota — ver abajo en el init
-const GROQ_KEY=(window.SIRYX_CONFIG&&window.SIRYX_CONFIG.groqKey)||cfg.groqKey||'';const groqKey=GROQ_KEY;const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${groqKey}`},body:JSON.stringify({model:'llama-3.1-8b-instant',max_tokens:1200,temperature:0.1,messages:[{role:'system',content:'Eres un sistema de comandas para restaurante colombiano. Responde ÚNICAMENTE con JSON válido, sin backticks, sin texto adicional.'},{role:'user',content:prompt}]})});const data=await res.json();if(data.error)throw new Error(data.error.message||'Error de API');const raw=data.choices?.[0]?.message?.content||'';const clean=raw.replace(/```json|```/g,'').trim();const parsed=JSON.parse(clean);const now=new Date();const fecha=now.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit',year:'numeric'});const hora=now.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});const mesaFinal=mesa||parsed.mesa||'';const meseroFinal=mesero||parsed.mesero||'';const tipoFinal=(tipo&&tipo!=='MESA')?tipo:(parsed.tipo||'MESA');if(!mesa&&parsed.mesa)document.getElementById('metaMesa').value=parsed.mesa;if(!mesero&&parsed.mesero)document.getElementById('metaMesero').value=parsed.mesero;if((!tipo||tipo==='MESA')&&parsed.tipo&&parsed.tipo!=='MESA')document.getElementById('metaTipo').value=parsed.tipo;ordenActual={id:numOrden,resto,mesa:mesaFinal,mesero:meseroFinal,tipo:tipoFinal,notas,items:parsed.items,tiene_precios:parsed.tiene_precios||false,subtotal:parsed.subtotal||0,resumen:parsed.resumen||'',fecha,hora,timestamp:now.toISOString()};renderTicket(ordenActual);playPrintSound();const tw=document.getElementById('ticketPreview');tw.classList.remove('animating');void tw.offsetWidth;tw.classList.add('animating');document.getElementById('ticketNumLabel').textContent=`#${numOrden}`;['btnImprimir','btnCopiarBT','btnGuardar'].forEach(id=>document.getElementById(id).disabled=false);const extras=[];if(parsed.mesa)extras.push(`📍 ${parsed.mesa}`);if(parsed.mesero)extras.push(`👤 ${parsed.mesero}`);if(parsed.tipo&&parsed.tipo!=='MESA')extras.push(parsed.tipo);const extraStr=extras.length?`· ${extras.join(' · ')}`:'';const pMsg=parsed.tiene_precios?`${parsed.items.length}ítem(s)— ${fmtNum(parsed.subtotal)}${extraStr}`:`${parsed.items.length}ítem(s)${extraStr}`;showStatus(`Comanda lista:${pMsg}`,'ok');}catch(e){if(e.message&&e.message.includes('401'))showStatus('API Key inválida. Verifica en ⚙','err');else showStatus('Error al procesar. Revisa el texto e intenta de nuevo.','err');console.error(e);}
-btn.disabled=false;btn.classList.remove('loading');}
-function renderTicket(o){const resto=o.resto||'Restaurante';const eslogan=cfg.eslogan||'';const cierre=cfg.cierre||'¡Gracias por tu pedido!';let html='<div class="t-c">';if(cfg.logoData)html+=`<img src="${cfg.logoData}"class="t-logo-img"style="width:56px;height:56px;object-fit:contain;margin:0 auto 4px;display:block">`;html+=`<div class="t-logo">${resto}</div>`;if(eslogan)html+=`<div style="font-size:9px">${eslogan}</div>`;html+=`</div><div class="t-double"></div>`;html+=`<div class="t-c t-b t-orden">ORDEN#${o.id}</div>`;html+=`<div class="t-c"style="font-size:10px">${o.fecha}${o.hora}</div>`;html+=`<div class="t-line"></div>`;if(o.tipo||o.mesa)html+=`<div style="font-size:10px"><b>${o.tipo||''}</b>${o.mesa?' — '+o.mesa:''}</div>`;if(o.mesero)html+=`<div style="font-size:10px">Mesero:${o.mesero}</div>`;html+=`<div class="t-line"></div>`;o.items.forEach(item=>{const lineTotal=item.qty*(item.unit_price||0);if(o.tiene_precios&&item.unit_price){html+=`<div class="t-row"><span class="t-qty">${item.qty}x</span><span class="t-name">${item.name}</span><span class="t-price">${fmtNum(lineTotal)}</span></div>`;if(item.qty>1)html+=`<div class="t-subtotal-row"><span></span><span style="font-size:9px;color:#777">${fmtNum(item.unit_price)}c/u</span></div>`;}else{html+=`<div class="t-row"><span class="t-qty">${item.qty}x</span><span class="t-name">${item.name}</span></div>`;}
-if(item.note)html+=`<div class="t-note">↳ ${item.note}</div>`;});html+=`<div class="t-line"></div>`;if(o.tiene_precios)html+=`<div class="t-total-row"><span>TOTAL</span><span>${fmtNum(o.subtotal)}</span></div><div class="t-line"></div>`;if(o.notas)html+=`<div style="font-size:9px;font-style:italic;margin-bottom:3px">📝 ${o.notas}</div><div class="t-line"></div>`;html+=`<div class="t-c"style="font-size:9px;margin-top:3px">${cierre}</div>`;if(cfg.qrLink){html+=`<div class="t-line"></div><div class="t-c"style="font-size:8px;margin-bottom:3px">Escanea para ver el menú</div>`;html+=`<div id="ticketQR"style="display:flex;justify-content:center;margin:4px 0"></div>`;}
-html+=`<div class="t-c"style="font-size:8px;color:#aaa;margin-top:2px">SiryX Comandas</div>`;document.getElementById('ticketPreview').innerHTML=html;if(cfg.qrLink){try{new QRCode(document.getElementById('ticketQR'),{text:cfg.qrLink,width:60,height:60,colorDark:'#000',colorLight:'#fff'});}catch(e){}}}
-function generarTextoPlano(o){const resto=o.resto||'Restaurante';const cierre=cfg.cierre||'¡Gracias por tu pedido!';const W=32;function pad(a,b,w=W){const g=w-a.length-b.length;return a+(g>0?' '.repeat(g):'  ')+b;}
-function center(s,w=W){const sp=Math.max(0,Math.floor((w-s.length)/2));return' '.repeat(sp)+s;}
-const S1='--------------------------------';const S2='================================';let lines=[];lines.push(center(resto.toUpperCase()));if(cfg.eslogan)lines.push(center(cfg.eslogan));lines.push(S2);lines.push(center(`ORDEN#${o.id}`));lines.push(center(`${o.fecha}${o.hora}`));lines.push(S1);if(o.tipo||o.mesa)lines.push(`${o.tipo||''}${o.mesa?' - '+o.mesa:''}`);if(o.mesero)lines.push(`Mesero:${o.mesero}`);lines.push(S1);o.items.forEach(item=>{const lt=item.qty*(item.unit_price||0);if(o.tiene_precios&&item.unit_price){lines.push(pad(`${item.qty}x ${item.name}`,fmtNum(lt)));if(item.qty>1)lines.push(pad('',`${fmtNum(item.unit_price)}c/u`));}
-else lines.push(`${item.qty}x ${item.name}`);if(item.note)lines.push(`->${item.note}`);});lines.push(S1);if(o.tiene_precios){lines.push(pad('TOTAL',fmtNum(o.subtotal)));lines.push(S1);}
-if(o.notas){lines.push(`Nota:${o.notas}`);lines.push(S1);}
-if(cfg.qrLink)lines.push(`QR:${cfg.qrLink}`);lines.push(center(cierre));lines.push(center('SiryX Comandas'));lines.push('');return lines.join('\n');}
-function imprimirWindows(){if(!ordenActual)return;const frame=document.getElementById('print-frame');frame.innerHTML=`<div class="ticket-print">${document.getElementById('ticketPreview').innerHTML}</div>`;setTimeout(()=>window.print(),100);}
-function copiarParaBT(){if(!ordenActual)return;const texto=generarTextoPlano(ordenActual);navigator.clipboard.writeText(texto).then(()=>{toast('✅ Copiado — pégalo en PrintHand o RawBT');document.getElementById('btHelp').classList.add('open');}).catch(()=>{const ta=document.createElement('textarea');ta.value=texto;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('✅ Copiado');});}
-function guardarComanda(){if(!ordenActual)return;comandas.unshift({...ordenActual});localStorage.setItem('siryx_comandas',JSON.stringify(comandas));counter++;localStorage.setItem('siryx_counter',String(counter));document.getElementById('histBadge').textContent=comandas.length;document.getElementById('btnGuardar').disabled=true;toast('💾 Comanda guardada');renderDashboard();}
-function toggleBTHelp(){document.getElementById('btHelp').classList.toggle('open');}
-function renderHistorial(){const list=document.getElementById('historialList');document.getElementById('histBadge').textContent=comandas.length;if(!comandas.length){list.innerHTML=`<div class="hist-empty"><div class="hist-empty-icon">📋</div><div>No hay comandas guardadas</div></div>`;return;}
-list.innerHTML=comandas.map((c,i)=>`<div class="hist-card"><div class="hist-card-header"onclick="toggleHist(${i})"><div class="hist-num">#${c.id}</div><div class="hist-meta"><div class="hist-resto">${c.resto||'—'}${c.mesa?' — '+c.mesa:''}</div><div class="hist-time">${c.fecha}${c.hora}· ${c.tipo||''}</div></div><div class="hist-right"><div class="hist-total">${c.tiene_precios?fmtNum(c.subtotal):c.items.length+' ítem(s)'}</div><span style="color:var(--muted);font-size:11px"id="arrow-${i}">▼</span></div></div><div class="hist-body"id="body-${i}"><div class="hist-items">${c.items.map(it=>`<div style="display:flex;justify-content:space-between;gap:8px"><span>${it.qty}x ${it.name}${it.note?`<span style="color:var(--muted);font-size:10px">(${it.note})</span>`:''}</span>${c.tiene_precios&&it.unit_price?`<span style="font-family:var(--mono);color:var(--green);font-size:11px">${fmtNum(it.qty*it.unit_price)}</span>`:''}</div>`).join('')}
-${c.tiene_precios?`<div style="border-top:1px solid var(--border);margin-top:5px;padding-top:5px;display:flex;justify-content:space-between;font-weight:600"><span>TOTAL</span><span style="font-family:var(--mono);color:var(--green)">${fmtNum(c.subtotal)}</span></div>`:''}</div>${c.notas?`<div style="font-size:10px;color:var(--muted);margin-top:5px">📝 ${c.notas}</div>`:''}<div class="hist-actions"><button class="btn-sm btn-sm-primary"onclick="reimprimirHist(${i})">🖨 Imprimir</button><button class="btn-sm btn-sm-outline"onclick="copiarHist(${i})">📱 Copiar BT</button><button class="btn-sm btn-sm-danger"onclick="eliminarComanda(${i})">🗑 Borrar</button></div></div></div>`).join('');}
+
+Reglas mesa/mesero/tipo:
+- mesa: "mesa 3","la 5","M4" → "Mesa 3". Nombre de cliente → úsalo. Sin info → ""
+- mesero: si mencionan quien toma el pedido → extráelo. Sin info → ""
+- tipo: MESA/DOMICILIO/PARA LLEVAR/BARRA según palabras clave
+Reglas ítems:
+- unit_price: número entero COP sin puntos. Sin precio → 0
+- note: modificaciones o ""
+- tiene_precios: true si hay AL MENOS UN precio
+- subtotal: suma qty*unit_price
+- Agrupa ítems idénticos
+- Precios: 18000, 18.000, $18000, 18k, 18 mil, c/u`;
+
+  try{
+    const GROQ_KEY='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';
+    const groqKey=cfg.groqKey||GROQ_KEY;
+    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${groqKey}`},
+      body:JSON.stringify({
+        model:'llama-3.1-8b-instant',max_tokens:1200,temperature:0.1,
+        messages:[
+          {role:'system',content:'Eres un sistema de comandas para restaurante colombiano. Responde ÚNICAMENTE con JSON válido, sin backticks, sin texto adicional.'},
+          {role:'user',content:prompt}
+        ]
+      })
+    });
+    const data=await res.json();
+    if(data.error) throw new Error(data.error.message||'Error de API');
+    const raw=data.choices?.[0]?.message?.content||'';
+    const clean=raw.replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(clean);
+
+    const now=new Date();
+    const fecha=now.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit',year:'numeric'});
+    const hora=now.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
+
+    const mesaFinal=mesa||parsed.mesa||'';
+    const meseroFinal=mesero||parsed.mesero||'';
+    const tipoFinal=(tipo&&tipo!=='MESA')?tipo:(parsed.tipo||'MESA');
+    if(!mesa&&parsed.mesa) document.getElementById('metaMesa').value=parsed.mesa;
+    if(!mesero&&parsed.mesero) document.getElementById('metaMesero').value=parsed.mesero;
+    if((!tipo||tipo==='MESA')&&parsed.tipo&&parsed.tipo!=='MESA') document.getElementById('metaTipo').value=parsed.tipo;
+
+    ordenActual={id:numOrden,resto,mesa:mesaFinal,mesero:meseroFinal,tipo:tipoFinal,notas,
+      items:parsed.items,tiene_precios:parsed.tiene_precios||false,
+      subtotal:parsed.subtotal||0,resumen:parsed.resumen||'',fecha,hora,timestamp:now.toISOString()};
+
+    renderTicket(ordenActual);
+    playPrintSound();
+
+    // Animación ticket
+    const tw=document.getElementById('ticketPreview');
+    tw.classList.remove('animating');
+    void tw.offsetWidth;
+    tw.classList.add('animating');
+
+    document.getElementById('ticketNumLabel').textContent=`#${numOrden}`;
+    ['btnImprimir','btnCopiarBT','btnGuardar'].forEach(id=>document.getElementById(id).disabled=false);
+
+    const extras=[];
+    if(parsed.mesa) extras.push(`📍 ${parsed.mesa}`);
+    if(parsed.mesero) extras.push(`👤 ${parsed.mesero}`);
+    if(parsed.tipo&&parsed.tipo!=='MESA') extras.push(parsed.tipo);
+    const extraStr=extras.length?` · ${extras.join(' · ')}`: '';
+    const pMsg=parsed.tiene_precios?`${parsed.items.length} ítem(s) — ${fmtNum(parsed.subtotal)}${extraStr}`:`${parsed.items.length} ítem(s)${extraStr}`;
+    showStatus(`Comanda lista: ${pMsg}`,'ok');
+
+  }catch(e){
+    if(e.message&&e.message.includes('401')) showStatus('API Key inválida. Verifica en ⚙','err');
+    else showStatus('Error al procesar. Revisa el texto e intenta de nuevo.','err');
+    console.error(e);
+  }
+  btn.disabled=false;btn.classList.remove('loading');
+}
+
+// ══ RENDER TICKET ══
+function renderTicket(o){
+  const resto=o.resto||'Restaurante';
+  const eslogan=cfg.eslogan||'';
+  const cierre=cfg.cierre||'¡Gracias por tu pedido!';
+
+  let html='<div class="t-c">';
+  if(cfg.logoData) html+=`<img src="${cfg.logoData}" class="t-logo-img" style="width:56px;height:56px;object-fit:contain;margin:0 auto 4px;display:block">`;
+  html+=`<div class="t-logo">${resto}</div>`;
+  if(eslogan) html+=`<div style="font-size:9px">${eslogan}</div>`;
+  html+=`</div><div class="t-double"></div>`;
+  html+=`<div class="t-c t-b t-orden">ORDEN #${o.id}</div>`;
+  html+=`<div class="t-c" style="font-size:10px">${o.fecha}  ${o.hora}</div>`;
+  html+=`<div class="t-line"></div>`;
+  if(o.tipo||o.mesa) html+=`<div style="font-size:10px"><b>${o.tipo||''}</b>${o.mesa?' — '+o.mesa:''}</div>`;
+  if(o.mesero) html+=`<div style="font-size:10px">Mesero: ${o.mesero}</div>`;
+  html+=`<div class="t-line"></div>`;
+
+  o.items.forEach(item=>{
+    const lineTotal=item.qty*(item.unit_price||0);
+    if(o.tiene_precios&&item.unit_price){
+      html+=`<div class="t-row"><span class="t-qty">${item.qty}x</span><span class="t-name">${item.name}</span><span class="t-price">${fmtNum(lineTotal)}</span></div>`;
+      if(item.qty>1) html+=`<div class="t-subtotal-row"><span></span><span style="font-size:9px;color:#777">${fmtNum(item.unit_price)} c/u</span></div>`;
+    } else {
+      html+=`<div class="t-row"><span class="t-qty">${item.qty}x</span><span class="t-name">${item.name}</span></div>`;
+    }
+    if(item.note) html+=`<div class="t-note">↳ ${item.note}</div>`;
+  });
+
+  html+=`<div class="t-line"></div>`;
+  if(o.tiene_precios) html+=`<div class="t-total-row"><span>TOTAL</span><span>${fmtNum(o.subtotal)}</span></div><div class="t-line"></div>`;
+  if(o.notas) html+=`<div style="font-size:9px;font-style:italic;margin-bottom:3px">📝 ${o.notas}</div><div class="t-line"></div>`;
+  html+=`<div class="t-c" style="font-size:9px;margin-top:3px">${cierre}</div>`;
+
+  // QR
+  if(cfg.qrLink){
+    html+=`<div class="t-line"></div><div class="t-c" style="font-size:8px;margin-bottom:3px">Escanea para ver el menú</div>`;
+    html+=`<div id="ticketQR" style="display:flex;justify-content:center;margin:4px 0"></div>`;
+  }
+  html+=`<div class="t-c" style="font-size:8px;color:#aaa;margin-top:2px">SiryX Comandas</div>`;
+
+  document.getElementById('ticketPreview').innerHTML=html;
+
+  if(cfg.qrLink){
+    try{ new QRCode(document.getElementById('ticketQR'),{text:cfg.qrLink,width:60,height:60,colorDark:'#000',colorLight:'#fff'}); }catch(e){}
+  }
+}
+
+// ══ TEXTO PLANO BT ══
+function generarTextoPlano(o){
+  const resto=o.resto||'Restaurante';
+  const cierre=cfg.cierre||'¡Gracias por tu pedido!';
+  const W=32;
+  function pad(a,b,w=W){const g=w-a.length-b.length;return a+(g>0?' '.repeat(g):'  ')+b;}
+  function center(s,w=W){const sp=Math.max(0,Math.floor((w-s.length)/2));return ' '.repeat(sp)+s;}
+  const S1='--------------------------------';const S2='================================';
+  let lines=[];
+  lines.push(center(resto.toUpperCase()));
+  if(cfg.eslogan) lines.push(center(cfg.eslogan));
+  lines.push(S2);lines.push(center(`ORDEN #${o.id}`));lines.push(center(`${o.fecha}  ${o.hora}`));lines.push(S1);
+  if(o.tipo||o.mesa) lines.push(`${o.tipo||''}${o.mesa?' - '+o.mesa:''}`);
+  if(o.mesero) lines.push(`Mesero: ${o.mesero}`);
+  lines.push(S1);
+  o.items.forEach(item=>{
+    const lt=item.qty*(item.unit_price||0);
+    if(o.tiene_precios&&item.unit_price){ lines.push(pad(`${item.qty}x ${item.name}`,fmtNum(lt))); if(item.qty>1) lines.push(pad('',`${fmtNum(item.unit_price)} c/u`)); }
+    else lines.push(`${item.qty}x ${item.name}`);
+    if(item.note) lines.push(`   -> ${item.note}`);
+  });
+  lines.push(S1);
+  if(o.tiene_precios){lines.push(pad('TOTAL',fmtNum(o.subtotal)));lines.push(S1);}
+  if(o.notas){lines.push(`Nota: ${o.notas}`);lines.push(S1);}
+  if(cfg.qrLink) lines.push(`QR: ${cfg.qrLink}`);
+  lines.push(center(cierre));lines.push(center('SiryX Comandas'));lines.push('');
+  return lines.join('\n');
+}
+
+// ══ IMPRIMIR ══
+function imprimirWindows(){
+  if(!ordenActual) return;
+  const frame=document.getElementById('print-frame');
+  frame.innerHTML=`<div class="ticket-print">${document.getElementById('ticketPreview').innerHTML}</div>`;
+  setTimeout(()=>window.print(),100);
+}
+
+function copiarParaBT(){
+  if(!ordenActual) return;
+  const texto=generarTextoPlano(ordenActual);
+  navigator.clipboard.writeText(texto).then(()=>{toast('✅ Copiado — pégalo en PrintHand o RawBT');document.getElementById('btHelp').classList.add('open');})
+  .catch(()=>{const ta=document.createElement('textarea');ta.value=texto;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('✅ Copiado');});
+}
+
+// ══ GUARDAR ══
+function guardarComanda(){
+  if(!ordenActual) return;
+  const mesaActual = (ordenActual.mesa||'').trim().toLowerCase();
+
+  // Detectar si hay comanda abierta de la misma mesa
+  if(mesaActual){
+    const abierta = comandas.findIndex(cmd=>
+      (cmd.estadoPago==='pendiente'||!cmd.pago||Object.keys(cmd.pago||{}).length===0) &&
+      cmd.estadoPago!=='fusionada' &&
+      (cmd.mesa||'').trim().toLowerCase()===mesaActual
+    );
+
+    if(abierta>=0){
+      const cmd=comandas[abierta];
+      const resp=confirm(
+        '⚠️ La '+cmd.mesa+' ya tiene una comanda abierta (#'+cmd.id+').\n\n'+
+        '¿Qué deseas hacer?\n\n'+
+        '✅ Aceptar → Enviar esta como comanda adicional a cocina (se marcarán como relacionadas)\n'+
+        '❌ Cancelar → Volver sin guardar'
+      );
+      if(!resp) return;
+      // Guardar relacionada a la mesa
+      const comandaCocina={...ordenActual, estadoPago:'pendiente', pago:{}, mesaRelacionada:cmd.id};
+      // Marcar la original como con adicionales
+      if(!comandas[abierta].adicionales) comandas[abierta].adicionales=[];
+      comandas[abierta].adicionales.push(ordenActual.id||('add'+Date.now()));
+      comandas.unshift(comandaCocina);
+      localStorage.setItem('siryx_comandas',JSON.stringify(comandas));
+      counter++;localStorage.setItem('siryx_counter',String(counter));
+      document.getElementById('histBadge').textContent=comandas.length;
+      document.getElementById('btnGuardar').disabled=true;
+      toast('🍳 Comanda adicional enviada a cocina — relacionada con #'+cmd.id);
+      renderDashboard();
+      renderHistorial();
+      return;
+    }
+  }
+
+  // Sin mesa abierta — guardar normal
+  const comandaParaCocina={...ordenActual, estadoPago:'pendiente', pago:{}};
+  comandas.unshift(comandaParaCocina);
+  localStorage.setItem('siryx_comandas',JSON.stringify(comandas));
+  counter++;localStorage.setItem('siryx_counter',String(counter));
+  document.getElementById('histBadge').textContent=comandas.length;
+  document.getElementById('btnGuardar').disabled=true;
+  toast('🍳 Comanda enviada a cocina');
+  renderDashboard();
+}
+
+function abrirModalPago(){
+  const total = ordenActual.subtotal || 0;
+  document.getElementById('pagoComandaInfo').textContent = 'Comanda #' + ordenActual.id + ' · ' + (ordenActual.mesa||'Sin mesa');
+  document.getElementById('pagoTotalLabel').textContent = '$' + fmtNum(total);
+  // Limpiar campos
+  ['pagoEfectivo','pagoNequi','pagoDaviplata','pagoBreb','pagoTarjeta','pagoOtro'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  // Si tiene total, pre-llenar efectivo
+  if(total>0) document.getElementById('pagoEfectivo').value = total;
+  calcularPago();
+  document.getElementById('modalPago').style.display='flex';
+}
+
+function cerrarModalPago(){
+  document.getElementById('modalPago').style.display='none';
+}
+
+function calcularPago(){
+  const ids=['pagoEfectivo','pagoNequi','pagoDaviplata','pagoBreb','pagoTarjeta','pagoOtro'];
+  let ingresado=0;
+  ids.forEach(id=>{
+    const val=parseFloat(document.getElementById(id)?.value)||0;
+    ingresado+=val;
+    const row=document.getElementById(id.replace('pago','row').replace('Efectivo','Efectivo').replace('Nequi','Nequi').replace('Daviplata','Daviplata').replace('Breb','Breb').replace('Tarjeta','Tarjeta').replace('Otro','Otro'));
+  });
+  const total=ordenActual?.subtotal||0;
+  const pendiente=total-ingresado;
+  document.getElementById('pagoIngresado').textContent='$'+fmtNum(ingresado);
+  const pendEl=document.getElementById('pagoPendiente');
+  if(pendiente>0){
+    pendEl.textContent='Pendiente: $'+fmtNum(pendiente);
+    pendEl.className='pago-pendiente mal';
+  } else if(pendiente<0){
+    pendEl.textContent='Cambio: $'+fmtNum(Math.abs(pendiente));
+    pendEl.className='pago-pendiente ok';
+  } else {
+    pendEl.textContent='✅ Exacto';
+    pendEl.className='pago-pendiente ok';
+  }
+}
+
+function confirmarPago(){
+  if(!ordenActual) return;
+  const pago={};
+  const metodos=['Efectivo','Nequi','Daviplata','Breb','Tarjeta','Otro'];
+  metodos.forEach(m=>{
+    const val=parseFloat(document.getElementById('pago'+m)?.value)||0;
+    if(val>0) pago[m.toLowerCase()]=val;
+  });
+  // Guardar comanda con info de pago
+  const comandaConPago={...ordenActual, pago, pagadoEl: new Date().toISOString()};
+  comandas.unshift(comandaConPago);
+  localStorage.setItem('siryx_comandas',JSON.stringify(comandas));
+  counter++;localStorage.setItem('siryx_counter',String(counter));
+  document.getElementById('histBadge').textContent=comandas.length;
+  document.getElementById('btnGuardar').disabled=true;
+  cerrarModalPago();
+  toast('💾 Comanda guardada con registro de pago');
+  renderDashboard();
+}
+
+function registrarPagoHistorial(idx){
+  const comanda = comandas[idx];
+  if(!comanda) return;
+  // Si ya tiene pago registrado, pedir clave para modificar
+  if(comanda.estadoPago==='pagado'&&comanda.pago&&Object.keys(comanda.pago).length>0){
+    if(cfg.adminHash){
+      const clave=prompt('🔐 Esta comanda ya fue pagada. Clave de admin para modificar:');
+      if(clave===null) return;
+      if(hashSimple(clave)!==cfg.adminHash){ toast('❌ Clave incorrecta'); return; }
+    }
+  }
+  // Guardar índice para confirmar después
+  window._pagoHistIdx = idx;
+  ordenActual = comanda; // usar la comanda del historial
+  abrirModalPago();
+}
+
+function confirmarPago(){
+  if(!ordenActual) return;
+  const pago={};
+  const metodos=['Efectivo','Nequi','Daviplata','Breb','Tarjeta','Otro'];
+  let totalPagado=0;
+  metodos.forEach(m=>{
+    const val=parseFloat(document.getElementById('pago'+m)?.value)||0;
+    if(val>0){ pago[m.toLowerCase()]=val; totalPagado+=val; }
+  });
+  if(totalPagado===0){ toast('❌ Ingresa al menos un método de pago'); return; }
+
+  // Si viene del historial actualizar esa comanda
+  if(window._pagoHistIdx !== undefined){
+    comandas[window._pagoHistIdx].pago = pago;
+    comandas[window._pagoHistIdx].estadoPago = 'pagado';
+    comandas[window._pagoHistIdx].pagadoEl = new Date().toISOString();
+    window._pagoHistIdx = undefined;
+  } else {
+    // Nueva comanda — guardar con pago
+    const comandaConPago={...ordenActual, pago, estadoPago:'pagado', pagadoEl:new Date().toISOString()};
+    comandas.unshift(comandaConPago);
+    counter++;localStorage.setItem('siryx_counter',String(counter));
+    document.getElementById('histBadge').textContent=comandas.length;
+    document.getElementById('btnGuardar').disabled=true;
+  }
+
+  localStorage.setItem('siryx_comandas',JSON.stringify(comandas));
+  cerrarModalPago();
+  renderHistorial();
+  renderDashboard();
+  toast('✅ Pago registrado correctamente');
+}
+
+
+// ══ EDITAR COMANDA ══
+let _editIdx = null;
+
+function editarComanda(idx){
+  if(cfg.adminHash){
+    const clave=prompt('🔐 Clave de administrador para editar:');
+    if(clave===null) return;
+    if(hashSimple(clave)!==cfg.adminHash){ toast('❌ Clave incorrecta'); return; }
+  }
+  const cmd = comandas[idx];
+  if(!cmd) return;
+  _editIdx = idx;
+  document.getElementById('editarInfo').textContent = 'Comanda #'+cmd.id+' · '+(cmd.mesa||'Sin mesa')+' · '+cmd.fecha+' '+cmd.hora;
+  document.getElementById('editarNotas').value = cmd.notas||'';
+
+  // Renderizar ítems actuales
+  const cont = document.getElementById('editarItems');
+  cont.innerHTML = (cmd.items||[]).map((item,i)=>
+    '<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--bg2);border-radius:6px;border:1px solid var(--border)">'
+    +'<span style="flex:1;font-size:12px">'+(item.cantidad||1)+'x '+item.nombre+(item.precio?' — $'+fmtNum(item.precio):'')+'</span>'
+    +'<button onclick="quitarItemEditar('+i+')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:0 4px">✕</button>'
+    +'</div>'
+  ).join('');
+
+  document.getElementById('modalEditar').style.display='flex';
+}
+
+function quitarItemEditar(itemIdx){
+  if(_editIdx===null) return;
+  comandas[_editIdx].items.splice(itemIdx,1);
+  // Recalcular subtotal
+  recalcularSubtotal(_editIdx);
+  editarComanda(_editIdx); // re-renderizar
+}
+
+function agregarItemEditar(){
+  if(_editIdx===null) return;
+  const nombre = document.getElementById('editarNuevoItem').value.trim();
+  const precio = parseFloat(document.getElementById('editarNuevoPrecio').value)||0;
+  if(!nombre){toast('❌ Escribe el nombre del ítem');return;}
+  if(!comandas[_editIdx].items) comandas[_editIdx].items=[];
+  comandas[_editIdx].items.push({cantidad:1, nombre, precio});
+  recalcularSubtotal(_editIdx);
+  document.getElementById('editarNuevoItem').value='';
+  document.getElementById('editarNuevoPrecio').value='';
+  editarComanda(_editIdx); // re-renderizar
+}
+
+function recalcularSubtotal(idx){
+  const items = comandas[idx].items||[];
+  const total = items.reduce((a,it)=>a+(it.precio||0)*(it.cantidad||1),0);
+  if(total>0) comandas[idx].subtotal=total;
+}
+
+function guardarEdicion(){
+  if(_editIdx===null) return;
+  const notas = document.getElementById('editarNotas').value.trim();
+  if(notas) comandas[_editIdx].notas=notas;
+  comandas[_editIdx].editadoEl=new Date().toISOString();
+  localStorage.setItem('siryx_comandas',JSON.stringify(comandas));
+  cerrarModalEditar();
+  renderHistorial();
+  renderDashboard();
+  toast('✅ Comanda actualizada');
+}
+
+function cerrarModalEditar(){
+  document.getElementById('modalEditar').style.display='none';
+  _editIdx=null;
+}
+
+// ══ FUSIONAR COMANDAS ══
+let _fusionBase = null;
+let _fusionSeleccionadas = new Set();
+
+function abrirFusionar(idx){
+  if(cfg.adminHash){
+    const clave=prompt('🔐 Clave de administrador para fusionar:');
+    if(clave===null) return;
+    if(hashSimple(clave)!==cfg.adminHash){ toast('❌ Clave incorrecta'); return; }
+  }
+  _fusionBase = idx;
+  _fusionSeleccionadas = new Set([idx]);
+  const lista = document.getElementById('fusionarLista');
+
+  // Mostrar solo comandas con pago pendiente
+  const pendientes = comandas.map((c,i)=>({c,i})).filter(({c,i})=>
+    (c.estadoPago==='pendiente'||!c.pago||Object.keys(c.pago||{}).length===0)
+  );
+
+  lista.innerHTML = pendientes.map(({c,i})=>{
+    const selec = _fusionSeleccionadas.has(i);
+    return '<div onclick="toggleFusion('+i+',this)" data-idx="'+i+'" style="display:flex;align-items:center;gap:10px;padding:10px;background:'+(selec?'rgba(255,140,0,.1)':'var(--bg2)')+';border:1px solid '+(selec?'#ff8c00':'var(--border)')+';border-radius:6px;cursor:pointer">'
+      +'<span style="font-size:16px">'+(selec?'☑':'☐')+'</span>'
+      +'<div style="flex:1">'
+      +'<div style="font-size:12px;font-weight:600">#'+c.id+' · '+(c.mesa||'Sin mesa')+'</div>'
+      +'<div style="font-size:11px;color:var(--muted)">'+c.fecha+' '+c.hora+' · '+(c.items||[]).length+' ítem(s)</div>'
+      +'</div>'
+      +'<span style="font-family:var(--mono);font-size:13px;font-weight:700;color:#ff8c00">'+( c.subtotal?'$'+fmtNum(c.subtotal):'Sin precio')+'</span>'
+      +'</div>';
+  }).join('');
+
+  calcularTotalFusion();
+  document.getElementById('modalFusionar').style.display='flex';
+}
+
+function toggleFusion(idx, el){
+  if(_fusionSeleccionadas.has(idx)){
+    if(_fusionSeleccionadas.size<=1){toast('Selecciona al menos 2 comandas');return;}
+    _fusionSeleccionadas.delete(idx);
+    el.style.background='var(--bg2)';
+    el.style.borderColor='var(--border)';
+    el.querySelector('span').textContent='☐';
+  } else {
+    _fusionSeleccionadas.add(idx);
+    el.style.background='rgba(255,140,0,.1)';
+    el.style.borderColor='#ff8c00';
+    el.querySelector('span').textContent='☑';
+  }
+  calcularTotalFusion();
+}
+
+function calcularTotalFusion(){
+  let total=0;
+  _fusionSeleccionadas.forEach(i=>{
+    total+=(comandas[i]?.subtotal||0);
+  });
+  document.getElementById('fusionarTotal').textContent='$'+fmtNum(total);
+}
+
+function confirmarFusion(){
+  if(_fusionSeleccionadas.size<2){toast('Selecciona al menos 2 comandas');return;}
+
+  // Crear comanda fusionada
+  const idxs = Array.from(_fusionSeleccionadas).sort((a,b)=>a-b);
+  const base = comandas[idxs[0]];
+  const itemsFusion = [];
+  let totalFusion = 0;
+  const idsFusion = [];
+
+  idxs.forEach(i=>{
+    const cmd=comandas[i];
+    idsFusion.push('#'+cmd.id);
+    (cmd.items||[]).forEach(it=>itemsFusion.push(it));
+    totalFusion+=(cmd.subtotal||0);
+  });
+
+  const fusionada = {
+    ...base,
+    id: base.id+'F',
+    items: itemsFusion,
+    subtotal: totalFusion,
+    notas: 'Fusión de comandas: '+idsFusion.join(', ')+(base.notas?' | '+base.notas:''),
+    estadoPago:'pendiente',
+    pago:{},
+    fusionadaDe: idxs
+  };
+
+  // Marcar las originales como fusionadas
+  idxs.forEach(i=>{
+    comandas[i].estadoPago='fusionada';
+    comandas[i].fusionadaEn=fusionada.id;
+  });
+
+  // Agregar la fusionada
+  comandas.unshift(fusionada);
+  localStorage.setItem('siryx_comandas',JSON.stringify(comandas));
+
+  cerrarModalFusionar();
+  renderHistorial();
+
+  // Abrir pago de la fusionada
+  ordenActual = fusionada;
+  window._pagoHistIdx = 0; // es la primera ahora
+  abrirModalPago();
+  toast('🔗 Comandas fusionadas — registra el pago');
+}
+
+function cerrarModalFusionar(){
+  document.getElementById('modalFusionar').style.display='none';
+  _fusionBase=null;
+  _fusionSeleccionadas=new Set();
+}
+
+function toggleBTHelp(){ document.getElementById('btHelp').classList.toggle('open'); }
+
+// ══ HISTORIAL ══
+function renderHistorial(){
+  const list=document.getElementById('historialList');
+  document.getElementById('histBadge').textContent=comandas.length;
+  if(!comandas.length){list.innerHTML=`<div class="hist-empty"><div class="hist-empty-icon">📋</div><div>No hay comandas guardadas</div></div>`;return;}
+  list.innerHTML=comandas.map((c,i)=>`
+    <div class="hist-card">
+      <div class="hist-card-header" onclick="toggleHist(${i})">
+        <div class="hist-num">#${c.id}</div>
+        <div class="hist-meta">
+          <div class="hist-resto">${c.resto||'—'}${c.mesa?' — '+c.mesa:''}</div>
+          <div class="hist-time">${c.fecha} ${c.hora} · ${c.tipo||''}</div>
+        </div>
+        <div class="hist-right">
+          <div class="hist-total">${c.tiene_precios?fmtNum(c.subtotal):c.items.length+' ítem(s)'}</div>
+          <span style="color:var(--muted);font-size:11px" id="arrow-${i}">▼</span>
+        </div>
+      </div>
+      <div class="hist-body" id="body-${i}">
+        <div class="hist-items">
+          ${c.items.map(it=>`<div style="display:flex;justify-content:space-between;gap:8px">
+            <span>${it.qty}x ${it.name}${it.note?` <span style="color:var(--muted);font-size:10px">(${it.note})</span>`:''}</span>
+            ${c.tiene_precios&&it.unit_price?`<span style="font-family:var(--mono);color:var(--green);font-size:11px">${fmtNum(it.qty*it.unit_price)}</span>`:''}
+          </div>`).join('')}
+          ${c.tiene_precios?`<div style="border-top:1px solid var(--border);margin-top:5px;padding-top:5px;display:flex;justify-content:space-between;font-weight:600"><span>TOTAL</span><span style="font-family:var(--mono);color:var(--green)">${fmtNum(c.subtotal)}</span></div>`:''}
+        </div>
+        ${c.notas?`<div style="font-size:10px;color:var(--muted);margin-top:5px">📝 ${c.notas}</div>`:''}
+        <div class="hist-actions">
+          ${c.estadoPago==='pendiente'||!c.pago||Object.keys(c.pago||{}).length===0
+            ? '<button class="btn-sm btn-sm-primary" onclick="registrarPagoHistorial('+i+')" style="background:rgba(59,139,255,.2);border:1px solid var(--accent);color:var(--accent)">💳 Registrar pago</button>'
+            : '<span style="font-size:10px;color:var(--green);padding:4px 8px;border:1px solid var(--green);border-radius:4px">✅ Pagado</span>'}
+          <button class="btn-sm btn-sm-outline" onclick="editarComanda(${i})">✏️ Editar</button>
+          <button class="btn-sm btn-sm-outline" onclick="abrirFusionar(${i})">🔗 Fusionar</button>
+          <button class="btn-sm btn-sm-primary" onclick="reimprimirHist(${i})">🖨 Imprimir</button>
+          <button class="btn-sm btn-sm-outline" onclick="copiarHist(${i})">📱 Copiar BT</button>
+          <button class="btn-sm btn-sm-danger" onclick="eliminarComanda(${i})">🗑 Borrar</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
 function toggleHist(i){const b=document.getElementById(`body-${i}`);const a=document.getElementById(`arrow-${i}`);b.classList.toggle('open');a.textContent=b.classList.contains('open')?'▲':'▼';}
 function reimprimirHist(i){ordenActual=comandas[i];renderTicket(comandas[i]);imprimirWindows();}
 function copiarHist(i){navigator.clipboard.writeText(generarTextoPlano(comandas[i])).then(()=>toast('✅ Copiado')).catch(()=>toast('✅ Copiado'));}
-function eliminarComanda(i){if(cfg.adminHash){pendingDeleteIdx=i;document.getElementById('pinVerificar').value='';document.getElementById('errPin').textContent='';document.getElementById('modalVerificar').classList.add('open');}
-else{if(!confirm('¿Eliminar esta comanda?'))return;_doEliminar(i);}}
-let pendingDeleteIdx=null;function hashSimple(str){let h=0;for(let i=0;i<str.length;i++){h=((h<<5)-h)+str.charCodeAt(i);h|=0;}return Math.abs(h).toString(36);}
+
+function eliminarComanda(i){
+  if(cfg.adminHash){pendingDeleteIdx=i;document.getElementById('pinVerificar').value='';document.getElementById('errPin').textContent='';document.getElementById('modalVerificar').classList.add('open');}
+  else{if(!confirm('¿Eliminar esta comanda?')) return;_doEliminar(i);}
+}
+
+// ══ SEGURIDAD ══
+let pendingDeleteIdx=null;
+function hashSimple(str){let h=0;for(let i=0;i<str.length;i++){h=((h<<5)-h)+str.charCodeAt(i);h|=0;}return Math.abs(h).toString(36);}
 function generarCodigo(){return Math.floor(10000000+Math.random()*90000000).toString();}
-function actualizarBtnClave(){const el=document.getElementById('claveEstadoBtn');if(el)el.textContent=cfg.adminHash?'🔐 Cambiar clave de administrador':'⚙ Configurar clave de administrador';}
-function abrirClave(){closeConfig();const tiene=!!cfg.adminHash;let html='';if(tiene){html=`<div class="modal-tabs"><button class="modal-tab active"onclick="switchClaveTab('cambiar',this)">Cambiar</button><button class="modal-tab"onclick="switchClaveTab('quitar',this)">Quitar</button></div><div class="modal-section active"id="claveTab-cambiar"style="gap:10px"><div class="modal-field"><label>Clave actual</label><input class="pin-input"id="claveActual"type="password"maxlength="20"placeholder="••••••"></div><div class="modal-field"><label>Nueva clave</label><input class="pin-input"id="claveNueva1"type="password"maxlength="20"placeholder="••••••"></div><div class="modal-field"><label>Confirmar</label><input class="pin-input"id="claveNueva2"type="password"maxlength="20"placeholder="••••••"></div><div id="claveErr"style="font-size:11px;color:var(--red);min-height:14px;text-align:center"></div><button class="btn btn-primary"onclick="cambiarClave()"style="width:100%">Guardar</button></div><div class="modal-section"id="claveTab-quitar"style="gap:10px"><div style="font-size:12px;color:var(--muted)">Ingresa tu clave actual para eliminar la protección.</div><input class="pin-input"id="claveQuitarInput"type="password"maxlength="20"placeholder="••••••"><div id="claveQuitarErr"style="font-size:11px;color:var(--red);min-height:14px;text-align:center"></div><button class="btn btn-danger"onclick="quitarClave()"style="width:100%">Quitar protección</button></div>`;}else{const codigo=generarCodigo();html=`<div style="font-size:12px;color:var(--muted);margin-bottom:4px">Crea una clave para proteger la eliminación de comandas.</div><div class="modal-field"><label>Nueva clave(mín.4 caracteres)</label><input class="pin-input"id="claveNueva1"type="password"maxlength="20"placeholder="••••••"></div><div class="modal-field"><label>Confirmar clave</label><input class="pin-input"id="claveNueva2"type="password"maxlength="20"placeholder="••••••"></div><div class="modal-field"><label>Pregunta secreta</label><select class="select-input"id="clavePregunta"><option value="mascota">¿Cuál es el nombre de tu mascota?</option><option value="madre">¿Cuál es el nombre de tu madre?</option><option value="ciudad">¿En qué ciudad naciste?</option><option value="colegio">¿Cuál fue tu primer colegio?</option><option value="plato">¿Cuál es tu plato favorito?</option></select></div><div class="modal-field"><label>Respuesta(en minúsculas)</label><input class="meta-input"id="claveRespuesta"placeholder="Tu respuesta"autocomplete="off"></div><div style="border-top:1px solid var(--border);margin:4px 0"></div><div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:4px">📸 Código de recuperación — guárdalo ahora:</div><div class="code-box">${codigo}</div><div class="code-hint">Toma captura o guárdalo en WhatsApp contigo mismo.</div><input type="hidden"id="codigoRecHidden"value="${codigo}"><div id="claveErr"style="font-size:11px;color:var(--red);min-height:14px;text-align:center"></div><button class="btn btn-primary"onclick="crearClave()"style="width:100%">✅ Ya guardé el código — Crear clave</button>`;}
-document.getElementById('claveContenido').innerHTML=html;document.getElementById('modalClave').classList.add('open');}
+function actualizarBtnClave(){const el=document.getElementById('claveEstadoBtn');if(el) el.textContent=cfg.adminHash?'🔐 Cambiar clave de administrador':'⚙ Configurar clave de administrador';}
+function abrirClave(){
+  closeConfig();
+  const tiene=!!cfg.adminHash;
+  let html='';
+  if(tiene){
+    html=`<div class="modal-tabs"><button class="modal-tab active" onclick="switchClaveTab('cambiar',this)">Cambiar</button><button class="modal-tab" onclick="switchClaveTab('quitar',this)">Quitar</button></div>
+    <div class="modal-section active" id="claveTab-cambiar" style="gap:10px">
+      <div class="modal-field"><label>Clave actual</label><input class="pin-input" id="claveActual" type="password" maxlength="20" placeholder="••••••"></div>
+      <div class="modal-field"><label>Nueva clave</label><input class="pin-input" id="claveNueva1" type="password" maxlength="20" placeholder="••••••"></div>
+      <div class="modal-field"><label>Confirmar</label><input class="pin-input" id="claveNueva2" type="password" maxlength="20" placeholder="••••••"></div>
+      <div id="claveErr" style="font-size:11px;color:var(--red);min-height:14px;text-align:center"></div>
+      <button class="btn btn-primary" onclick="cambiarClave()" style="width:100%">Guardar</button>
+    </div>
+    <div class="modal-section" id="claveTab-quitar" style="gap:10px">
+      <div style="font-size:12px;color:var(--muted)">Ingresa tu clave actual para eliminar la protección.</div>
+      <input class="pin-input" id="claveQuitarInput" type="password" maxlength="20" placeholder="••••••">
+      <div id="claveQuitarErr" style="font-size:11px;color:var(--red);min-height:14px;text-align:center"></div>
+      <button class="btn btn-danger" onclick="quitarClave()" style="width:100%">Quitar protección</button>
+    </div>`;
+  } else {
+    const codigo=generarCodigo();
+    html=`<div style="font-size:12px;color:var(--muted);margin-bottom:4px">Crea una clave para proteger la eliminación de comandas.</div>
+    <div class="modal-field"><label>Nueva clave (mín. 4 caracteres)</label><input class="pin-input" id="claveNueva1" type="password" maxlength="20" placeholder="••••••"></div>
+    <div class="modal-field"><label>Confirmar clave</label><input class="pin-input" id="claveNueva2" type="password" maxlength="20" placeholder="••••••"></div>
+    <div class="modal-field"><label>Pregunta secreta</label>
+      <select class="select-input" id="clavePregunta">
+        <option value="mascota">¿Cuál es el nombre de tu mascota?</option>
+        <option value="madre">¿Cuál es el nombre de tu madre?</option>
+        <option value="ciudad">¿En qué ciudad naciste?</option>
+        <option value="colegio">¿Cuál fue tu primer colegio?</option>
+        <option value="plato">¿Cuál es tu plato favorito?</option>
+      </select>
+    </div>
+    <div class="modal-field"><label>Respuesta (en minúsculas)</label><input class="meta-input" id="claveRespuesta" placeholder="Tu respuesta" autocomplete="off"></div>
+    <div style="border-top:1px solid var(--border);margin:4px 0"></div>
+    <div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:4px">📸 Código de recuperación — guárdalo ahora:</div>
+    <div class="code-box">${codigo}</div>
+    <div class="code-hint">Toma captura o guárdalo en WhatsApp contigo mismo.</div>
+    <input type="hidden" id="codigoRecHidden" value="${codigo}">
+    <div id="claveErr" style="font-size:11px;color:var(--red);min-height:14px;text-align:center"></div>
+    <button class="btn btn-primary" onclick="crearClave()" style="width:100%">✅ Ya guardé el código — Crear clave</button>`;
+  }
+  document.getElementById('claveContenido').innerHTML=html;
+  document.getElementById('modalClave').classList.add('open');
+}
 function switchClaveTab(name,btn){document.querySelectorAll('#claveContenido .modal-section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('#claveContenido .modal-tab').forEach(b=>b.classList.remove('active'));document.getElementById('claveTab-'+name).classList.add('active');btn.classList.add('active');}
 function crearClave(){const c1=document.getElementById('claveNueva1').value;const c2=document.getElementById('claveNueva2').value;const preg=document.getElementById('clavePregunta').value;const resp=document.getElementById('claveRespuesta').value.trim().toLowerCase();const codigo=document.getElementById('codigoRecHidden').value;const err=document.getElementById('claveErr');if(c1.length<4){err.textContent='Mínimo 4 caracteres';return;}if(c1!==c2){err.textContent='Las claves no coinciden';return;}if(!resp){err.textContent='Ingresa la respuesta';return;}cfg.adminHash=hashSimple(c1);cfg.adminPregunta=preg;cfg.adminRespHash=hashSimple(resp);cfg.adminCodigo=hashSimple(codigo);localStorage.setItem('siryx_cfg',JSON.stringify(cfg));document.getElementById('modalClave').classList.remove('open');actualizarBtnClave();toast('🔐 Clave creada');}
 function cambiarClave(){const actual=document.getElementById('claveActual').value;const c1=document.getElementById('claveNueva1').value;const c2=document.getElementById('claveNueva2').value;const err=document.getElementById('claveErr');if(hashSimple(actual)!==cfg.adminHash){err.textContent='Clave actual incorrecta';return;}if(c1.length<4){err.textContent='Mínimo 4 caracteres';return;}if(c1!==c2){err.textContent='Las claves no coinciden';return;}cfg.adminHash=hashSimple(c1);localStorage.setItem('siryx_cfg',JSON.stringify(cfg));document.getElementById('modalClave').classList.remove('open');toast('🔐 Clave actualizada');}
@@ -729,60 +1599,373 @@ function limpiarErrPin(){document.getElementById('errPin').textContent='';}
 function closeVerificar(){document.getElementById('modalVerificar').classList.remove('open');pendingDeleteIdx=null;}
 function confirmarEliminar(){const val=document.getElementById('pinVerificar').value;if(hashSimple(val)!==cfg.adminHash){document.getElementById('errPin').textContent='Clave incorrecta. Intenta de nuevo.';document.getElementById('pinVerificar').value='';return;}document.getElementById('modalVerificar').classList.remove('open');_doEliminar(pendingDeleteIdx);pendingDeleteIdx=null;}
 function _doEliminar(i){comandas.splice(i,1);localStorage.setItem('siryx_comandas',JSON.stringify(comandas));renderHistorial();renderDashboard();toast('🗑 Comanda eliminada');}
-const preguntas={mascota:'¿Cuál es el nombre de tu mascota?',madre:'¿Cuál es el nombre de tu madre?',ciudad:'¿En qué ciudad naciste?',colegio:'¿Cuál fue tu primer colegio?',plato:'¿Cuál es tu plato favorito?'};function abrirRecuperacion(){document.getElementById('modalVerificar').classList.remove('open');document.getElementById('recRespuesta').value='';document.getElementById('recCodigo').value='';document.getElementById('recPreguntaErr').textContent='';document.getElementById('recCodigoErr').textContent='';document.getElementById('recPreguntaTexto').textContent=preguntas[cfg.adminPregunta]||'Pregunta no configurada';document.getElementById('modalRecuperar').classList.add('open');}
+const preguntas={mascota:'¿Cuál es el nombre de tu mascota?',madre:'¿Cuál es el nombre de tu madre?',ciudad:'¿En qué ciudad naciste?',colegio:'¿Cuál fue tu primer colegio?',plato:'¿Cuál es tu plato favorito?'};
+function abrirRecuperacion(){document.getElementById('modalVerificar').classList.remove('open');document.getElementById('recRespuesta').value='';document.getElementById('recCodigo').value='';document.getElementById('recPreguntaErr').textContent='';document.getElementById('recCodigoErr').textContent='';document.getElementById('recPreguntaTexto').textContent=preguntas[cfg.adminPregunta]||'Pregunta no configurada';document.getElementById('modalRecuperar').classList.add('open');}
 function closeRecuperar(){document.getElementById('modalRecuperar').classList.remove('open');}
 function switchRecTab(name,btn){document.querySelectorAll('#modalRecuperar .modal-section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('#modalRecuperar .modal-tab').forEach(b=>b.classList.remove('active'));document.getElementById('recTab-'+name).classList.add('active');btn.classList.add('active');}
 function verificarPregunta(){const resp=document.getElementById('recRespuesta').value.trim().toLowerCase();if(hashSimple(resp)!==cfg.adminRespHash){document.getElementById('recPreguntaErr').textContent='Respuesta incorrecta.';return;}closeRecuperar();abrirNuevaClave();}
 function verificarCodigo(){const cod=document.getElementById('recCodigo').value.trim();if(hashSimple(cod)!==cfg.adminCodigo){document.getElementById('recCodigoErr').textContent='Código incorrecto.';return;}closeRecuperar();abrirNuevaClave();}
 function abrirNuevaClave(){document.getElementById('nuevaClaveInput').value='';document.getElementById('nuevaClaveConfirm').value='';document.getElementById('nuevaClaveErr').textContent='';document.getElementById('modalNuevaClave').classList.add('open');}
 function guardarNuevaClave(){const c1=document.getElementById('nuevaClaveInput').value;const c2=document.getElementById('nuevaClaveConfirm').value;const err=document.getElementById('nuevaClaveErr');if(c1.length<4){err.textContent='Mínimo 4 caracteres';return;}if(c1!==c2){err.textContent='Las claves no coinciden';return;}cfg.adminHash=hashSimple(c1);localStorage.setItem('siryx_cfg',JSON.stringify(cfg));document.getElementById('modalNuevaClave').classList.remove('open');toast('🔐 Nueva clave guardada');if(pendingDeleteIdx!==null){document.getElementById('pinVerificar').value='';document.getElementById('errPin').textContent='✅ Clave restablecida. Ingresa tu nueva clave.';document.getElementById('modalVerificar').classList.add('open');}}
+
+// ══ BACKUP ══
 function exportarDatos(){const backup={version:'1.0',exportado:new Date().toISOString(),restaurante:cfg.resto||'SiryX Comandas',contador:counter,comandas};const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');const fecha=new Date().toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit',year:'numeric'}).replace(/\//g,'-');a.href=url;a.download=`siryx-backup-${fecha}.json`;a.click();URL.revokeObjectURL(url);toast('✅ Backup exportado');}
-function importarDatos(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=function(e){try{const data=JSON.parse(e.target.result);if(!data.comandas||!Array.isArray(data.comandas))throw new Error('Formato inválido');if(!confirm(`¿Importar ${data.comandas.length}comandas de"${data.restaurante||'backup'}"?\n\nEsto reemplazará todos los datos actuales.`))return;comandas=data.comandas;if(data.contador)counter=data.contador;localStorage.setItem('siryx_comandas',JSON.stringify(comandas));localStorage.setItem('siryx_counter',String(counter));document.getElementById('histBadge').textContent=comandas.length;renderDashboard();closeConfig();toast(`✅ ${comandas.length}comandas importadas`);}catch(err){toast('❌ Archivo inválido o corrupto');}};reader.readAsText(file);event.target.value='';}
-function getChartColors(){const dark=document.documentElement.getAttribute('data-theme')==='dark';return{grid:dark?'rgba(255,255,255,.06)':'rgba(0,0,0,.06)',text:dark?'#5a5d72':'#8a8faa',bg:dark?'#1e2029':'#f5f6fa'};}
-function renderDashboard(){const now=new Date();const hoy=now.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit',year:'numeric'});const mesStr=`${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`;const ordHoy=comandas.filter(c=>c.fecha===hoy);const ordMes=comandas.filter(c=>c.fecha&&c.fecha.slice(3)===mesStr);const ventasHoy=ordHoy.reduce((a,c)=>a+(c.subtotal||0),0);const ventasMes=ordMes.reduce((a,c)=>a+(c.subtotal||0),0);const conPrecios=comandas.filter(c=>c.tiene_precios&&c.subtotal>0);const prom=conPrecios.length?Math.round(conPrecios.reduce((a,c)=>a+(c.subtotal||0),0)/conPrecios.length):0;document.getElementById('dVentasHoy').textContent=fmtNum(ventasHoy);document.getElementById('dOrdHoy').textContent=`${ordHoy.length}orden${ordHoy.length!==1?'es':''}`;document.getElementById('dVentasMes').textContent=fmtNum(ventasMes);document.getElementById('dOrdMes').textContent=`${ordMes.length}orden${ordMes.length!==1?'es':''}`;document.getElementById('dTicketProm').textContent=fmtNum(prom);document.getElementById('dTotalOrd').textContent=comandas.length;const cc=getChartColors();const ACCENT=['#3b8bff','#00c8ff','#00d68f','#ffc107','#ff6b35','#ff4757','#a855f7'];const days7=[];for(let d=6;d>=0;d--){const dd=new Date(now);dd.setDate(dd.getDate()-d);const lbl=dd.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit'});const dn=['Do','Lu','Ma','Mi','Ju','Vi','Sá'][dd.getDay()];const cnt=comandas.filter(c=>c.fecha===lbl).length;days7.push({lbl:dn,cnt});}
-const totalSemana=days7.reduce((a,d)=>a+d.cnt,0);document.getElementById('chartSemanaTotal').textContent=`${totalSemana}órdenes`;if(chartSemana)chartSemana.destroy();chartSemana=new Chart(document.getElementById('chartSemana'),{type:'doughnut',data:{labels:days7.map(d=>d.lbl),datasets:[{data:days7.map(d=>d.cnt||0.01),backgroundColor:ACCENT,borderColor:cc.bg,borderWidth:2,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{position:'right',labels:{color:cc.text,font:{size:10},padding:8,boxWidth:10}},tooltip:{callbacks:{label:ctx=>`${ctx.label}:${ctx.raw===0.01?0:ctx.raw}órdenes`}}}}});const horasBucket={};comandas.forEach(c=>{if(!c.hora)return;const h=parseInt(c.hora.split(':')[0]);const slot=h<12?'Mañana 6-12':h<15?'Almuerzo 12-15':h<19?'Tarde 15-19':'Noche 19+';horasBucket[slot]=(horasBucket[slot]||0)+1;});const horaLabels=Object.keys(horasBucket);const horaVals=Object.values(horasBucket);const topHora=horaLabels[horaVals.indexOf(Math.max(...horaVals))]||'—';document.getElementById('chartHoraTop').textContent=`Pico:${topHora}`;if(chartHoras)chartHoras.destroy();chartHoras=new Chart(document.getElementById('chartHoras'),{type:'doughnut',data:{labels:horaLabels.length?horaLabels:['Sin datos'],datasets:[{data:horaVals.length?horaVals:[1],backgroundColor:horaVals.length?ACCENT:['#2a2d3a'],borderColor:cc.bg,borderWidth:2,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{position:'right',labels:{color:cc.text,font:{size:10},padding:8,boxWidth:10}},tooltip:{callbacks:{label:ctx=>`${ctx.label}:${ctx.raw}órdenes`}}}}});const diasSemana=['Lu','Ma','Mi','Ju','Vi','Sá','Do'];const hoyDow=now.getDay();const semActual=[];const semAnterior=[];for(let d=0;d<7;d++){const ddA=new Date(now);ddA.setDate(ddA.getDate()-(hoyDow===0?6:hoyDow-1)+d);const ddP=new Date(ddA);ddP.setDate(ddP.getDate()-7);const lblA=ddA.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit'});const lblP=ddP.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit'});semActual.push(comandas.filter(c=>c.fecha===lblA).length);semAnterior.push(comandas.filter(c=>c.fecha===lblP).length);}
-const totA=semActual.reduce((a,v)=>a+v,0);const totP=semAnterior.reduce((a,v)=>a+v,0);const diff=totP>0?Math.round((totA-totP)/totP*100):0;document.getElementById('chartCompLabel').textContent=diff>=0?`+${diff}%vs semana anterior`:`${diff}%vs semana anterior`;if(chartComp)chartComp.destroy();chartComp=new Chart(document.getElementById('chartComparativo'),{type:'line',data:{labels:diasSemana,datasets:[{label:'Esta semana',data:semActual,borderColor:'#3b8bff',backgroundColor:'rgba(59,139,255,.1)',tension:.4,fill:true,pointBackgroundColor:'#3b8bff',pointRadius:4},{label:'Semana anterior',data:semAnterior,borderColor:'#5a5d72',backgroundColor:'rgba(90,93,114,.05)',tension:.4,fill:true,pointBackgroundColor:'#5a5d72',pointRadius:3,borderDash:[4,4]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:cc.text,font:{size:10},padding:12,boxWidth:10}}},scales:{x:{ticks:{color:cc.text,font:{size:10}},grid:{color:cc.grid}},y:{ticks:{color:cc.text,font:{size:10},stepSize:1},grid:{color:cc.grid},beginAtZero:true}}}});const prodCount={};comandas.forEach(c=>c.items.forEach(it=>{const k=it.name;prodCount[k]=(prodCount[k]||0)+it.qty;}));const top5=Object.entries(prodCount).sort((a,b)=>b[1]-a[1]).slice(0,5);const maxProd=top5.length?top5[0][1]:1;document.getElementById('topProductos').innerHTML=top5.length?top5.map(([name,cnt],i)=>`<div class="top-item"><div class="top-rank">${i+1}</div><div class="top-name">${name}</div><div class="top-bar-wrap"><div class="top-bar-fill"style="width:${(cnt/maxProd)*100}%"></div></div><div class="top-count">${cnt}</div></div>`).join(''):'<div style="color:var(--muted);font-size:12px;padding:10px 0">Sin datos aún</div>';document.getElementById('recentTable').innerHTML=comandas.slice(0,8).length?comandas.slice(0,8).map(c=>`<tr><td class="td-num">#${c.id}</td><td>${c.mesa||'—'}</td><td style="font-family:var(--mono);font-size:10px;color:var(--muted)">${c.hora}</td><td class="td-total">${c.tiene_precios?fmtNum(c.subtotal):c.items.length+' ítem(s)'}</td></tr>`).join(''):`<tr><td colspan="4"style="text-align:center;color:var(--muted);padding:16px">Sin registros</td></tr>`;}
-function generarFingerprint(){const d=[navigator.userAgent,navigator.language,screen.colorDepth,screen.width+'x'+screen.height,new Date().getTimezoneOffset(),navigator.hardwareConcurrency||0,navigator.platform||''].join('|');let h=0;for(let i=0;i<d.length;i++){h=((h<<5)-h)+d.charCodeAt(i);h=h&h;}
-return Math.abs(h).toString(36).toUpperCase().slice(0,8);}
-function verificarFingerprint(){const fp=generarFingerprint();const lic=JSON.parse(localStorage.getItem('siryx_licencia_v3')||'{}');if(lic.activa&&lic.fingerprint&&lic.fingerprint!==fp){localStorage.removeItem('siryx_licencia_v3');}
-return fp;}
-const LICENSE_SECRET='SiryX2024$Connect#';function hashLicencia(str){let h=5381;for(let i=0;i<str.length;i++)h=((h<<5)+h)^str.charCodeAt(i);return Math.abs(h);}
-function generarClaveMes(clienteId,mes,anio){const seed=`${LICENSE_SECRET}|${clienteId.toLowerCase().trim()}|${mes}|${anio}`;const h=hashLicencia(seed);const part1=('000'+(h%9999+1000)).slice(-4);const part2=('000'+((h>>4)%9999+1000)).slice(-4);const part3=('000'+((h>>8)%9999+1000)).slice(-4);return`${part1}-${part2}-${part3}`.toUpperCase();}
-function generarClaveFechas(clienteId,fechaInicio,fechaFin){const seed=`|${clienteId.toLowerCase().trim()}|${fechaInicio}|${fechaFin}`;const h=hashLicencia(seed);const part1=("000"+(h%9999+1000)).slice(-4);const part2=("000"+((h>>4)%9999+1000)).slice(-4);const part3=("000"+((h>>8)%9999+1000)).slice(-4);return`${part1}-${part2}-${part3}`.toUpperCase();}
+function importarDatos(event){const file=event.target.files[0];if(!file) return;const reader=new FileReader();reader.onload=function(e){try{const data=JSON.parse(e.target.result);if(!data.comandas||!Array.isArray(data.comandas)) throw new Error('Formato inválido');if(!confirm(`¿Importar ${data.comandas.length} comandas de "${data.restaurante||'backup'}"?\n\nEsto reemplazará todos los datos actuales.`)) return;comandas=data.comandas;if(data.contador) counter=data.contador;localStorage.setItem('siryx_comandas',JSON.stringify(comandas));localStorage.setItem('siryx_counter',String(counter));document.getElementById('histBadge').textContent=comandas.length;renderDashboard();closeConfig();toast(`✅ ${comandas.length} comandas importadas`);}catch(err){toast('❌ Archivo inválido o corrupto');}};reader.readAsText(file);event.target.value='';}
 
-function decodificarClave(clave,clienteId){try{const parts=clave.trim().toUpperCase().split('-');if(parts.length!==3)return null;const dIni=parseInt(parts[0],36);const dFin=parseInt(parts[1],36);const checkIngresado=parts[2];const seed=`${LICENSE_SECRET}|${clienteId.toLowerCase().trim()}|${dIni}|${dFin}`;const h=hashLicencia(seed);const checkEsperado=('000'+(h%9999+1000)).slice(-4);if(checkIngresado!==checkEsperado)return null;const fechaInicio=new Date(dIni*86400000).toISOString().slice(0,10);const fechaFin=new Date(dFin*86400000).toISOString().slice(0,10);return{fechaInicio,fechaFin,dIni,dFin};}catch(e){return null;}}
-function verificarLicencia(){const input=document.getElementById('actInput').value.trim().toUpperCase();const errEl=document.getElementById('actErr');errEl.textContent='';if(!input){errEl.textContent='Ingresa la clave de activación';return;}
-const idIngresado=document.getElementById('actClienteId')?document.getElementById('actClienteId').value.trim().toLowerCase():'';if(!cfg.clienteId&&!idIngresado){errEl.textContent='Ingresa tu ID de cliente';document.getElementById('actClienteId').focus();return;}
-if(idIngresado)cfg.clienteId=idIngresado;localStorage.setItem('siryx_cfg',JSON.stringify(cfg));const decoded=decodificarClave(input,cfg.clienteId);if(!decoded){errEl.textContent='Clave incorrecta. Verifica con SiryX Connect.';document.getElementById('actInput').value='';return;}
-const now=new Date();const fechaFin=new Date(decoded.fechaFin+'T23:59:59');const gracia=new Date(fechaFin);gracia.setDate(gracia.getDate()+2);if(now>gracia){errEl.textContent='Esta clave ya venció. Solicita la nueva a SiryX Connect — WhatsApp 320 369 4094';return;}
-cfg.licencia={activa:true,fingerprint:generarFingerprint(),clienteId:cfg.clienteId,fechaInicio:decoded.fechaInicio,fechaFin:decoded.fechaFin,expira:fechaFin.toISOString(),activadoEl:cfg.licencia?.activadoEl||now.toISOString()};localStorage.setItem('siryx_cfg',JSON.stringify(cfg));document.getElementById('activationScreen').classList.add('hidden');iniciarApp();toast(`✅ Licencia activa hasta el ${fechaFin.toLocaleDateString('es-CO')}`);}
 
-// Licencia remota — mismo algoritmo que keygen
-document.addEventListener('DOMContentLoaded',()=>{document.getElementById('actInput').addEventListener('keydown',e=>{if(e.key==='Enter')verificarLicencia();});document.getElementById('cfgQrLink').addEventListener('input',renderQRPreview);});function checkLicencia(){const lic=cfg.licencia;if(!lic||!lic.activa)return false;const now=new Date();const expira=new Date(lic.expira);const gracia=new Date(expira);gracia.setDate(gracia.getDate()+3);if(now>gracia)return false;const claveGuardada=generarClaveMes(lic.clienteId,lic.mes,lic.anio);return true;}
-function mostrarEstadoLicencia(){const idWrap=document.getElementById('actIdWrap');const idInput=document.getElementById('actClienteId');if(cfg.clienteId&&idWrap&&idInput){idInput.value=cfg.clienteId;idWrap.style.opacity='0.5';const lbl=idWrap.querySelector('div');if(lbl)lbl.textContent=`ID:${cfg.clienteId}`;}
-const lic=cfg.licencia;const estadoEl=document.getElementById('actEstado');if(!estadoEl)return;if(lic&&lic.activa){const expira=new Date(lic.expira);const now=new Date();const diasRestantes=Math.ceil((expira-now)/(1000*60*60*24));if(diasRestantes>5){estadoEl.innerHTML=`<div class="act-ok">✅ Licencia activa — vence el ${expira.toLocaleDateString('es-CO')}</div>`;}else if(diasRestantes>0){estadoEl.innerHTML=`<div class="act-warn">⚠️ Licencia vence en ${diasRestantes}día(s)— renueva con SiryX Connect</div>`;}else{estadoEl.innerHTML=`<div class="act-warn"style="color:var(--red)">❌ Licencia vencida — ingresa la nueva clave</div>`;}}}
-function iniciarApp(){applyTheme();actualizarBtnClave();actualizarHeaderLogo();if(cfg.mesero)document.getElementById('metaMesero').value=cfg.mesero;document.getElementById('histBadge').textContent=comandas.length;initSplash();setTimeout(renderDashboard,2100);if(!cfg.groqKey){setTimeout(()=>showStatus('👋 Configura tu API Key de Groq gratis en ⚙ para empezar','info'),2200);}}
-verificarFingerprint();applyTheme();
-// VERIFICAR LICENCIA REMOTA PRIMERO — config.js tiene prioridad sobre licencia local
-if(window.SIRYX_CONFIG){
-  const _gid=(window.SIRYX_CONFIG.gymId||'').trim();
-  const _gkey=(window.SIRYX_CONFIG.gymKey||'').trim();
-  if(!_gid||!_gkey||!verificarLicenciaRemota(_gid,_gkey)){
-    mostrarBloqueoComandas();
+// Dashboard protegido con clave admin
+function accederDashboard(btn){
+  if(!cfg.adminHash){
+    // Sin clave configurada — acceso libre
+    switchTab('dashboard', btn);
+    return;
+  }
+  // Pedir clave antes de mostrar
+  const clave = prompt('🔐 Ingresa la clave de administrador para ver Ventas:');
+  if(clave === null) return; // canceló
+  if(hashSimple(clave) === cfg.adminHash){
+    switchTab('dashboard', btn);
   } else {
-    // Config.js válido — ahora verificar licencia local del usuario
-    mostrarEstadoLicencia();
-    if(checkLicencia()){
-      document.getElementById('activationScreen').classList.add('hidden');
-      iniciarApp();
+    toast('❌ Clave incorrecta');
+    // Regresar al tab activo anterior
+    const tabs = document.querySelectorAll('.tab-btn');
+    tabs.forEach(t => { if(t !== btn && t.classList.contains('active')) t.click(); });
+  }
+}
+
+// ══ DASHBOARD CON GRÁFICOS ══
+function getChartColors(){
+  const dark=document.documentElement.getAttribute('data-theme')==='dark';
+  return{grid:dark?'rgba(255,255,255,.06)':'rgba(0,0,0,.06)',text:dark?'#5a5d72':'#8a8faa',bg:dark?'#1e2029':'#f5f6fa'};
+}
+
+function renderDashboard(){
+  const now=new Date();
+  const hoy=now.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const mesStr=`${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`;
+  const ordHoy=comandas.filter(c=>c.fecha===hoy);
+  const ordMes=comandas.filter(c=>c.fecha&&c.fecha.slice(3)===mesStr);
+  const ventasHoy=ordHoy.reduce((a,c)=>a+(c.subtotal||0),0);
+  const ventasMes=ordMes.reduce((a,c)=>a+(c.subtotal||0),0);
+  const conPrecios=comandas.filter(c=>c.tiene_precios&&c.subtotal>0);
+  const prom=conPrecios.length?Math.round(conPrecios.reduce((a,c)=>a+(c.subtotal||0),0)/conPrecios.length):0;
+  document.getElementById('dVentasHoy').textContent=fmtNum(ventasHoy);
+  document.getElementById('dOrdHoy').textContent=`${ordHoy.length} orden${ordHoy.length!==1?'es':''}`;
+  document.getElementById('dVentasMes').textContent=fmtNum(ventasMes);
+  document.getElementById('dOrdMes').textContent=`${ordMes.length} orden${ordMes.length!==1?'es':''}`;
+  document.getElementById('dTicketProm').textContent=fmtNum(prom);
+  document.getElementById('dTotalOrd').textContent=comandas.length;
+
+  const cc=getChartColors();
+  const ACCENT=['#3b8bff','#00c8ff','#00d68f','#ffc107','#ff6b35','#ff4757','#a855f7'];
+
+  // 1. DONA — Ventas últimos 7 días
+  const days7=[];
+  for(let d=6;d>=0;d--){
+    const dd=new Date(now);dd.setDate(dd.getDate()-d);
+    const lbl=dd.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit'});
+    const dn=['Do','Lu','Ma','Mi','Ju','Vi','Sá'][dd.getDay()];
+    const cnt=comandas.filter(c=>c.fecha===lbl).length;
+    days7.push({lbl:dn,cnt});
+  }
+  const totalSemana=days7.reduce((a,d)=>a+d.cnt,0);
+  document.getElementById('chartSemanaTotal').textContent=`${totalSemana} órdenes`;
+  if(chartSemana) chartSemana.destroy();
+  // Resumen por método de pago del día
+  const hoyStr=new Date().toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const comandasHoy=comandas.filter(c=>c.fecha===hoyStr&&c.pago);
+  const resumenPagos={};
+  comandasHoy.forEach(c=>{
+    if(c.pago) Object.entries(c.pago).forEach(([m,v])=>{ resumenPagos[m]=(resumenPagos[m]||0)+v; });
+  });
+  const metIconos={efectivo:'💵',nequi:'🟣',daviplata:'🔴',breb:'🔵',tarjeta:'💳',otro:'💸'};
+  const resumenEl=document.getElementById('dashResumenPagos');
+  if(resumenEl){
+    if(Object.keys(resumenPagos).length){
+      resumenEl.innerHTML='<div style="font-family:var(--display);font-size:13px;letter-spacing:1px;color:var(--muted);margin-bottom:8px">MÉTODOS DE PAGO HOY</div>'+
+        Object.entries(resumenPagos).map(([m,v])=>
+          '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)">'+
+          '<span>'+(metIconos[m]||'💸')+' '+m.charAt(0).toUpperCase()+m.slice(1)+'</span>'+
+          '<span style="font-family:var(--mono);font-weight:700;color:var(--accent)">$'+fmtNum(v)+'</span></div>'
+        ).join('');
     } else {
-      mostrarEstadoLicencia();
+      resumenEl.innerHTML='<div style="color:var(--muted);font-size:12px;text-align:center;padding:10px">Sin pagos registrados hoy</div>';
     }
   }
-} else {
-  // Sin config.js — bloquear siempre
-  mostrarBloqueoComandas();
+
+  chartSemana=new Chart(document.getElementById('chartSemana'),{
+    type:'doughnut',
+    data:{
+      labels:days7.map(d=>d.lbl),
+      datasets:[{data:days7.map(d=>d.cnt||0.01),backgroundColor:ACCENT,borderColor:cc.bg,borderWidth:2,hoverOffset:6}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{position:'right',labels:{color:cc.text,font:{size:10},padding:8,boxWidth:10}},tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.raw===0.01?0:ctx.raw} órdenes`}}}}
+  });
+
+  // 2. DONA — Ventas por hora
+  const horasBucket={};
+  comandas.forEach(c=>{
+    if(!c.hora) return;
+    const h=parseInt(c.hora.split(':')[0]);
+    const slot=h<12?'Mañana 6-12':h<15?'Almuerzo 12-15':h<19?'Tarde 15-19':'Noche 19+';
+    horasBucket[slot]=(horasBucket[slot]||0)+1;
+  });
+  const horaLabels=Object.keys(horasBucket);
+  const horaVals=Object.values(horasBucket);
+  const topHora=horaLabels[horaVals.indexOf(Math.max(...horaVals))]||'—';
+  document.getElementById('chartHoraTop').textContent=`Pico: ${topHora}`;
+  if(chartHoras) chartHoras.destroy();
+  chartHoras=new Chart(document.getElementById('chartHoras'),{
+    type:'doughnut',
+    data:{
+      labels:horaLabels.length?horaLabels:['Sin datos'],
+      datasets:[{data:horaVals.length?horaVals:[1],backgroundColor:horaVals.length?ACCENT:['#2a2d3a'],borderColor:cc.bg,borderWidth:2,hoverOffset:6}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{position:'right',labels:{color:cc.text,font:{size:10},padding:8,boxWidth:10}},tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.raw} órdenes`}}}}
+  });
+
+  // 3. LÍNEA — Comparativo semana actual vs anterior
+  const diasSemana=['Lu','Ma','Mi','Ju','Vi','Sá','Do'];
+  const hoyDow=now.getDay();
+  const semActual=[];const semAnterior=[];
+  for(let d=0;d<7;d++){
+    const ddA=new Date(now);ddA.setDate(ddA.getDate()-(hoyDow===0?6:hoyDow-1)+d);
+    const ddP=new Date(ddA);ddP.setDate(ddP.getDate()-7);
+    const lblA=ddA.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit'});
+    const lblP=ddP.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit'});
+    semActual.push(comandas.filter(c=>c.fecha===lblA).length);
+    semAnterior.push(comandas.filter(c=>c.fecha===lblP).length);
+  }
+  const totA=semActual.reduce((a,v)=>a+v,0);
+  const totP=semAnterior.reduce((a,v)=>a+v,0);
+  const diff=totP>0?Math.round((totA-totP)/totP*100):0;
+  document.getElementById('chartCompLabel').textContent=diff>=0?`+${diff}% vs semana anterior`:`${diff}% vs semana anterior`;
+  if(chartComp) chartComp.destroy();
+  chartComp=new Chart(document.getElementById('chartComparativo'),{
+    type:'line',
+    data:{
+      labels:diasSemana,
+      datasets:[
+        {label:'Esta semana',data:semActual,borderColor:'#3b8bff',backgroundColor:'rgba(59,139,255,.1)',tension:.4,fill:true,pointBackgroundColor:'#3b8bff',pointRadius:4},
+        {label:'Semana anterior',data:semAnterior,borderColor:'#5a5d72',backgroundColor:'rgba(90,93,114,.05)',tension:.4,fill:true,pointBackgroundColor:'#5a5d72',pointRadius:3,borderDash:[4,4]}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:cc.text,font:{size:10},padding:12,boxWidth:10}}},scales:{x:{ticks:{color:cc.text,font:{size:10}},grid:{color:cc.grid}},y:{ticks:{color:cc.text,font:{size:10},stepSize:1},grid:{color:cc.grid},beginAtZero:true}}}
+  });
+
+  // 4. TOP 5 PRODUCTOS
+  const prodCount={};
+  comandas.forEach(c=>c.items.forEach(it=>{const k=it.name;prodCount[k]=(prodCount[k]||0)+it.qty;}));
+  const top5=Object.entries(prodCount).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const maxProd=top5.length?top5[0][1]:1;
+  document.getElementById('topProductos').innerHTML=top5.length
+    ? top5.map(([name,cnt],i)=>`<div class="top-item">
+        <div class="top-rank">${i+1}</div>
+        <div class="top-name">${name}</div>
+        <div class="top-bar-wrap"><div class="top-bar-fill" style="width:${(cnt/maxProd)*100}%"></div></div>
+        <div class="top-count">${cnt}</div>
+      </div>`).join('')
+    : '<div style="color:var(--muted);font-size:12px;padding:10px 0">Sin datos aún</div>';
+
+  // 5. Tabla reciente
+  document.getElementById('recentTable').innerHTML=comandas.slice(0,8).length
+    ? comandas.slice(0,8).map(c=>`<tr>
+        <td class="td-num">#${c.id}</td>
+        <td>${c.mesa||'—'}</td>
+        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">${c.hora}</td>
+        <td class="td-total">${c.tiene_precios?fmtNum(c.subtotal):c.items.length+' ítem(s)'}</td>
+      </tr>`).join('')
+    : `<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:16px">Sin registros</td></tr>`;
 }
+
+// ══ SISTEMA DE LICENCIA ══
+// Clave secreta compartida entre keygen y app (no visible para el usuario final)
+const LICENSE_SECRET = 'SiryX2024$Connect#';
+
+function hashLicencia(str){
+  // Hash simple pero efectivo para generar claves reproducibles
+  let h = 5381;
+  for(let i=0;i<str.length;i++) h=((h<<5)+h)^str.charCodeAt(i);
+  return Math.abs(h);
+}
+
+function generarClaveMes(clienteId, mes, anio){
+  // clienteId: identificador único del cliente (ej: "burger_mania")
+  // mes: 1-12, anio: 2024
+  const seed = `${LICENSE_SECRET}|${clienteId.toLowerCase().trim()}|${mes}|${anio}`;
+  const h = hashLicencia(seed);
+  // Genera clave en formato XXXX-XXXX-XXXX
+  const part1 = ('000'+(h%9999+1000)).slice(-4);
+  const part2 = ('000'+((h>>4)%9999+1000)).slice(-4);
+  const part3 = ('000'+((h>>8)%9999+1000)).slice(-4);
+  return `${part1}-${part2}-${part3}`.toUpperCase();
+}
+
+function generarClaveFechas(clienteId, fechaInicio, fechaFin){
+  const seed = `|${clienteId.toLowerCase().trim()}|${fechaInicio}|${fechaFin}`;
+  const h = hashLicencia(seed);
+  const part1 = ("000"+(h%9999+1000)).slice(-4);
+  const part2 = ("000"+((h>>4)%9999+1000)).slice(-4);
+  const part3 = ("000"+((h>>8)%9999+1000)).slice(-4);
+  return `${part1}-${part2}-${part3}`.toUpperCase();
+}
+
+
+function generarClaveFechas(clienteId, fechaInicio, fechaFin){
+  const dIni = Math.floor(new Date(fechaInicio).getTime() / 86400000);
+  const dFin = Math.floor(new Date(fechaFin).getTime()   / 86400000);
+  const encIni = dIni.toString(36).toUpperCase().padStart(4,'0');
+  const encFin = dFin.toString(36).toUpperCase().padStart(4,'0');
+  const seed = `${LICENSE_SECRET}|${clienteId.toLowerCase().trim()}|${dIni}|${dFin}`;
+  const h = hashLicencia(seed);
+  const check = ('000'+(h%9999+1000)).slice(-4);
+  return `${encIni}-${encFin}-${check}`.toUpperCase();
+}
+
+function decodificarClave(clave, clienteId){
+  try{
+    const parts = clave.trim().toUpperCase().split('-');
+    if(parts.length !== 3) return null;
+    const dIni = parseInt(parts[0], 36);
+    const dFin = parseInt(parts[1], 36);
+    const checkIngresado = parts[2];
+    const seed = `${LICENSE_SECRET}|${clienteId.toLowerCase().trim()}|${dIni}|${dFin}`;
+    const h = hashLicencia(seed);
+    const checkEsperado = ('000'+(h%9999+1000)).slice(-4);
+    if(checkIngresado !== checkEsperado) return null;
+    const fechaInicio = new Date(dIni * 86400000).toISOString().slice(0,10);
+    const fechaFin    = new Date(dFin  * 86400000).toISOString().slice(0,10);
+    return { fechaInicio, fechaFin, dIni, dFin };
+  } catch(e){ return null; }
+}
+function verificarLicencia(){
+  const input = document.getElementById('actInput').value.trim().toUpperCase();
+  const errEl = document.getElementById('actErr');
+  errEl.textContent='';
+
+  if(!input){ errEl.textContent='Ingresa la clave de activación'; return; }
+
+  // Leer ID del campo en pantalla o usar el guardado
+  const idIngresado = document.getElementById('actClienteId')
+    ? document.getElementById('actClienteId').value.trim().toLowerCase()
+    : '';
+  if(!cfg.clienteId && !idIngresado){
+    errEl.textContent='Ingresa tu ID de cliente';
+    document.getElementById('actClienteId').focus();
+    return;
+  }
+  if(idIngresado) cfg.clienteId = idIngresado;
+  localStorage.setItem('siryx_cfg', JSON.stringify(cfg));
+
+  // Decodificar la clave — las fechas vienen dentro de ella
+  const decoded = decodificarClave(input, cfg.clienteId);
+
+  if(!decoded){
+    errEl.textContent='Clave incorrecta. Verifica con SiryX Connect.';
+    document.getElementById('actInput').value='';
+    return;
+  }
+
+  const now = new Date();
+  const fechaFin = new Date(decoded.fechaFin + 'T23:59:59');
+  // 2 días de gracia
+  const gracia = new Date(fechaFin);
+  gracia.setDate(gracia.getDate()+2);
+
+  if(now > gracia){
+    errEl.textContent='Esta clave ya venció. Solicita la nueva a SiryX Connect — WhatsApp 320 369 4094';
+    return;
+  }
+
+  cfg.licencia = {
+    activa: true,
+    clienteId: cfg.clienteId,
+    fechaInicio: decoded.fechaInicio,
+    fechaFin: decoded.fechaFin,
+    expira: fechaFin.toISOString(),
+    activadoEl: cfg.licencia?.activadoEl || now.toISOString()
+  };
+  localStorage.setItem('siryx_cfg', JSON.stringify(cfg));
+  document.getElementById('activationScreen').classList.add('hidden');
+  iniciarApp();
+  toast(`✅ Licencia activa hasta el ${fechaFin.toLocaleDateString('es-CO')}`);
+}
+
+// Enter en el input activa
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('actInput').addEventListener('keydown',e=>{ if(e.key==='Enter') verificarLicencia(); });
+  document.getElementById('cfgQrLink').addEventListener('input', renderQRPreview);
+});
+
+function checkLicencia(){
+  const lic = cfg.licencia;
+  if(!lic||!lic.activa) return false;
+
+  const now = new Date();
+  const expira = new Date(lic.expira);
+  // Dar 3 días de gracia después de expirar
+  const gracia = new Date(expira);
+  gracia.setDate(gracia.getDate()+3);
+
+  if(now > gracia) return false; // Bloqueado definitivamente
+
+  // Verificar que la clave del mes guardado sigue siendo válida
+  const claveGuardada = generarClaveMes(lic.clienteId, lic.mes, lic.anio);
+  return true; // Si llegó hasta aquí, está activa
+}
+
+function mostrarEstadoLicencia(){
+  // Si ya tiene ID guardado, ocultarlo y mostrarlo como info
+  const idWrap = document.getElementById('actIdWrap');
+  const idInput = document.getElementById('actClienteId');
+  if(cfg.clienteId && idWrap && idInput){
+    idInput.value = cfg.clienteId;
+    idWrap.style.opacity = '0.5';
+    const lbl = idWrap.querySelector('div');
+    if(lbl) lbl.textContent = `ID: ${cfg.clienteId}`;
+  }
+  const lic = cfg.licencia;
+  const estadoEl = document.getElementById('actEstado');
+  if(!estadoEl) return;
+
+  if(lic && lic.activa){
+    const expira = new Date(lic.expira);
+    const now = new Date();
+    const diasRestantes = Math.ceil((expira-now)/(1000*60*60*24));
+
+    if(diasRestantes > 5){
+      estadoEl.innerHTML=`<div class="act-ok">✅ Licencia activa — vence el ${expira.toLocaleDateString('es-CO')}</div>`;
+    } else if(diasRestantes > 0){
+      estadoEl.innerHTML=`<div class="act-warn">⚠️ Licencia vence en ${diasRestantes} día(s) — renueva con SiryX Connect</div>`;
+    } else {
+      estadoEl.innerHTML=`<div class="act-warn" style="color:var(--red)">❌ Licencia vencida — ingresa la nueva clave</div>`;
+    }
+  }
+}
+
+function iniciarApp(){
+  applyTheme();
+  actualizarBtnClave();
+  actualizarHeaderLogo();
+  if(cfg.mesero) document.getElementById('metaMesero').value=cfg.mesero;
+  document.getElementById('histBadge').textContent=comandas.length;
+  initSplash();
+  setTimeout(renderDashboard, 2100);
+  if(!cfg.groqKey){ setTimeout(()=>showStatus('👋 Configura tu API Key de Groq gratis en ⚙ para empezar','info'),2200); }
+}
+
+// ══ INIT ══
+applyTheme();
+mostrarEstadoLicencia();
+
+if(checkLicencia()){
+  document.getElementById('activationScreen').classList.add('hidden');
+  iniciarApp();
+} else {
+  // Mostrar pantalla de activación
+  mostrarEstadoLicencia();
+}
+
 </script>
 </body>
 </html>
