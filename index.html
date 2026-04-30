@@ -692,17 +692,7 @@ Reglas ítems:-unit_price:número entero COP sin puntos.Sin precio → 0
 -subtotal:suma qty*unit_price
 -Agrupa ítems idénticos
 -Precios:18000,18.000,$18000,18k,18 mil,c/u`;try{// Verificar licencia remota del restaurante
-// Verificar licencia — bloquear si no hay clave, está vacía o vencida
-if(window.SIRYX_CONFIG){
-  const _gid=(window.SIRYX_CONFIG.gymId||'').trim();
-  const _gkey=(window.SIRYX_CONFIG.gymKey||'').trim();
-  if(!_gid||!_gkey||!verificarLicenciaRemota(_gid,_gkey)){
-    mostrarBloqueoComandas();
-  }
-} else {
-  // Sin config.js — bloquear
-  mostrarBloqueoComandas();
-}
+// Verificación de licencia remota — ver abajo en el init
 const GROQ_KEY=(window.SIRYX_CONFIG&&window.SIRYX_CONFIG.groqKey)||cfg.groqKey||'';const groqKey=GROQ_KEY;const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${groqKey}`},body:JSON.stringify({model:'llama-3.1-8b-instant',max_tokens:1200,temperature:0.1,messages:[{role:'system',content:'Eres un sistema de comandas para restaurante colombiano. Responde ÚNICAMENTE con JSON válido, sin backticks, sin texto adicional.'},{role:'user',content:prompt}]})});const data=await res.json();if(data.error)throw new Error(data.error.message||'Error de API');const raw=data.choices?.[0]?.message?.content||'';const clean=raw.replace(/```json|```/g,'').trim();const parsed=JSON.parse(clean);const now=new Date();const fecha=now.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit',year:'numeric'});const hora=now.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});const mesaFinal=mesa||parsed.mesa||'';const meseroFinal=mesero||parsed.mesero||'';const tipoFinal=(tipo&&tipo!=='MESA')?tipo:(parsed.tipo||'MESA');if(!mesa&&parsed.mesa)document.getElementById('metaMesa').value=parsed.mesa;if(!mesero&&parsed.mesero)document.getElementById('metaMesero').value=parsed.mesero;if((!tipo||tipo==='MESA')&&parsed.tipo&&parsed.tipo!=='MESA')document.getElementById('metaTipo').value=parsed.tipo;ordenActual={id:numOrden,resto,mesa:mesaFinal,mesero:meseroFinal,tipo:tipoFinal,notas,items:parsed.items,tiene_precios:parsed.tiene_precios||false,subtotal:parsed.subtotal||0,resumen:parsed.resumen||'',fecha,hora,timestamp:now.toISOString()};renderTicket(ordenActual);playPrintSound();const tw=document.getElementById('ticketPreview');tw.classList.remove('animating');void tw.offsetWidth;tw.classList.add('animating');document.getElementById('ticketNumLabel').textContent=`#${numOrden}`;['btnImprimir','btnCopiarBT','btnGuardar'].forEach(id=>document.getElementById(id).disabled=false);const extras=[];if(parsed.mesa)extras.push(`📍 ${parsed.mesa}`);if(parsed.mesero)extras.push(`👤 ${parsed.mesero}`);if(parsed.tipo&&parsed.tipo!=='MESA')extras.push(parsed.tipo);const extraStr=extras.length?`· ${extras.join(' · ')}`:'';const pMsg=parsed.tiene_precios?`${parsed.items.length}ítem(s)— ${fmtNum(parsed.subtotal)}${extraStr}`:`${parsed.items.length}ítem(s)${extraStr}`;showStatus(`Comanda lista:${pMsg}`,'ok');}catch(e){if(e.message&&e.message.includes('401'))showStatus('API Key inválida. Verifica en ⚙','err');else showStatus('Error al procesar. Revisa el texto e intenta de nuevo.','err');console.error(e);}
 btn.disabled=false;btn.classList.remove('loading');}
 function renderTicket(o){const resto=o.resto||'Restaurante';const eslogan=cfg.eslogan||'';const cierre=cfg.cierre||'¡Gracias por tu pedido!';let html='<div class="t-c">';if(cfg.logoData)html+=`<img src="${cfg.logoData}"class="t-logo-img"style="width:56px;height:56px;object-fit:contain;margin:0 auto 4px;display:block">`;html+=`<div class="t-logo">${resto}</div>`;if(eslogan)html+=`<div style="font-size:9px">${eslogan}</div>`;html+=`</div><div class="t-double"></div>`;html+=`<div class="t-c t-b t-orden">ORDEN#${o.id}</div>`;html+=`<div class="t-c"style="font-size:10px">${o.fecha}${o.hora}</div>`;html+=`<div class="t-line"></div>`;if(o.tipo||o.mesa)html+=`<div style="font-size:10px"><b>${o.tipo||''}</b>${o.mesa?' — '+o.mesa:''}</div>`;if(o.mesero)html+=`<div style="font-size:10px">Mesero:${o.mesero}</div>`;html+=`<div class="t-line"></div>`;o.items.forEach(item=>{const lineTotal=item.qty*(item.unit_price||0);if(o.tiene_precios&&item.unit_price){html+=`<div class="t-row"><span class="t-qty">${item.qty}x</span><span class="t-name">${item.name}</span><span class="t-price">${fmtNum(lineTotal)}</span></div>`;if(item.qty>1)html+=`<div class="t-subtotal-row"><span></span><span style="font-size:9px;color:#777">${fmtNum(item.unit_price)}c/u</span></div>`;}else{html+=`<div class="t-row"><span class="t-qty">${item.qty}x</span><span class="t-name">${item.name}</span></div>`;}
@@ -772,7 +762,27 @@ document.addEventListener('DOMContentLoaded',()=>{document.getElementById('actIn
 function mostrarEstadoLicencia(){const idWrap=document.getElementById('actIdWrap');const idInput=document.getElementById('actClienteId');if(cfg.clienteId&&idWrap&&idInput){idInput.value=cfg.clienteId;idWrap.style.opacity='0.5';const lbl=idWrap.querySelector('div');if(lbl)lbl.textContent=`ID:${cfg.clienteId}`;}
 const lic=cfg.licencia;const estadoEl=document.getElementById('actEstado');if(!estadoEl)return;if(lic&&lic.activa){const expira=new Date(lic.expira);const now=new Date();const diasRestantes=Math.ceil((expira-now)/(1000*60*60*24));if(diasRestantes>5){estadoEl.innerHTML=`<div class="act-ok">✅ Licencia activa — vence el ${expira.toLocaleDateString('es-CO')}</div>`;}else if(diasRestantes>0){estadoEl.innerHTML=`<div class="act-warn">⚠️ Licencia vence en ${diasRestantes}día(s)— renueva con SiryX Connect</div>`;}else{estadoEl.innerHTML=`<div class="act-warn"style="color:var(--red)">❌ Licencia vencida — ingresa la nueva clave</div>`;}}}
 function iniciarApp(){applyTheme();actualizarBtnClave();actualizarHeaderLogo();if(cfg.mesero)document.getElementById('metaMesero').value=cfg.mesero;document.getElementById('histBadge').textContent=comandas.length;initSplash();setTimeout(renderDashboard,2100);if(!cfg.groqKey){setTimeout(()=>showStatus('👋 Configura tu API Key de Groq gratis en ⚙ para empezar','info'),2200);}}
-verificarFingerprint();applyTheme();mostrarEstadoLicencia();if(checkLicencia()){document.getElementById('activationScreen').classList.add('hidden');iniciarApp();}else{mostrarEstadoLicencia();}
+verificarFingerprint();applyTheme();
+// VERIFICAR LICENCIA REMOTA PRIMERO — config.js tiene prioridad sobre licencia local
+if(window.SIRYX_CONFIG){
+  const _gid=(window.SIRYX_CONFIG.gymId||'').trim();
+  const _gkey=(window.SIRYX_CONFIG.gymKey||'').trim();
+  if(!_gid||!_gkey||!verificarLicenciaRemota(_gid,_gkey)){
+    mostrarBloqueoComandas();
+  } else {
+    // Config.js válido — ahora verificar licencia local del usuario
+    mostrarEstadoLicencia();
+    if(checkLicencia()){
+      document.getElementById('activationScreen').classList.add('hidden');
+      iniciarApp();
+    } else {
+      mostrarEstadoLicencia();
+    }
+  }
+} else {
+  // Sin config.js — bloquear siempre
+  mostrarBloqueoComandas();
+}
 </script>
 </body>
 </html>
