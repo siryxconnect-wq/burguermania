@@ -22,7 +22,7 @@
 :root{
   --accent:#3b8bff;--accent2:#00c8ff;
   --orange:#ff6b35;--green:#00d68f;--yellow:#ffc107;--red:#ff4757;
-  --mono:'Share Tech Mono',monospace;--sans:'DM Sans',sans-serif;--display:'Bebas Neue',cursive;
+  --mono:'Share Tech Mono',monospace;--sans:'Inter',sans-serif;--display:'Inter',sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box;transition:background-color .2s,border-color .2s,color .1s}
 html,body{height:100%;-webkit-tap-highlight-color:transparent}
@@ -94,7 +94,7 @@ header{
 /* ══ TABS ══ */
 .tabs-nav{background:var(--s1);border-bottom:1px solid var(--border);display:flex;padding:0 12px;flex-shrink:0;overflow-x:auto}
 .tabs-nav::-webkit-scrollbar{height:0}
-.tab-btn{background:none;border:none;color:var(--muted);padding:11px 16px;font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
+.tab-btn{background:none;border:none;color:var(--muted);padding:11px 16px;font-family:var(--sans);font-size:14px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
 .tab-btn:hover{color:var(--text)}
 .tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
 .tab-badge{background:var(--accent);color:#fff;font-size:9px;padding:1px 5px;border-radius:10px;margin-left:5px;font-family:var(--mono)}
@@ -110,10 +110,10 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
 .meta-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 .meta-field{display:flex;flex-direction:column;gap:4px}
 .meta-field label{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
-.meta-input{background:var(--s2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:5px;font-family:var(--sans);font-size:12px;transition:border .15s}
+.meta-input{background:var(--s2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:5px;font-family:var(--sans);font-size:14px;transition:border .15s}
 .meta-input:focus{outline:none;border-color:var(--accent)}
 .meta-input::placeholder{color:var(--muted)}
-.paste-zone{background:var(--s2);border:2px dashed var(--border);border-radius:8px;padding:14px;min-height:130px;font-family:var(--sans);font-size:13px;color:var(--text);resize:vertical;transition:border .2s;line-height:1.6;width:100%}
+.paste-zone{background:var(--s2);border:2px dashed var(--border);border-radius:8px;padding:14px;min-height:130px;font-family:var(--sans);font-size:15px;color:var(--text);resize:vertical;transition:border .2s;line-height:1.6;width:100%}
 .paste-zone:focus{outline:none;border-color:var(--accent);border-style:solid}
 .paste-zone::placeholder{color:var(--muted);font-size:12px}
 .notas-field{background:var(--s2);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:5px;font-family:var(--sans);font-size:12px;resize:none;height:52px;line-height:1.5;width:100%}
@@ -132,7 +132,7 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
 .spinner{width:12px;height:12px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none}
 .btn.loading .spinner{display:block}
 @keyframes spin{to{transform:rotate(360deg)}}
-.status-bar{padding:8px 12px;border-radius:5px;font-size:12px;font-weight:500;display:none;align-items:center;gap:7px}
+.status-bar{padding:8px 12px;border-radius:5px;font-size:14px;font-weight:500;display:none;align-items:center;gap:7px}
 .status-bar.ok{background:rgba(0,214,143,.1);border:1px solid rgba(0,214,143,.3);color:var(--green);display:flex}
 .status-bar.err{background:rgba(255,71,87,.1);border:1px solid rgba(255,71,87,.3);color:var(--red);display:flex}
 .status-bar.info{background:rgba(59,139,255,.1);border:1px solid rgba(59,139,255,.3);color:var(--accent);display:flex}
@@ -185,10 +185,10 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
 .hist-resto{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hist-time{font-size:10px;color:var(--muted);font-family:var(--mono)}
 .hist-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.hist-total{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--green)}
+.hist-total{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--green)}
 .hist-body{padding:10px 14px;display:none;border-top:1px solid var(--border)}
 .hist-body.open{display:block}
-.hist-items{font-size:12px;line-height:1.9;color:var(--text)}
+.hist-items{font-size:14px;line-height:1.9;color:var(--text)}
 .hist-actions{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap}
 .btn-sm{padding:5px 11px;border-radius:4px;border:none;font-family:var(--sans);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s}
 .btn-sm-outline{background:none;border:1px solid var(--border);color:var(--muted)}
@@ -226,7 +226,7 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
 .top-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
 .top-item:last-child{border-bottom:none}
 .top-rank{font-family:var(--mono);font-size:11px;color:var(--muted);width:20px;text-align:center}
-.top-name{flex:1;font-size:12px;font-weight:500}
+.top-name{flex:1;font-size:14px;font-weight:500}
 .top-bar-wrap{width:80px;height:6px;background:var(--s2);border-radius:3px;overflow:hidden}
 .top-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .6s ease}
 .top-count{font-family:var(--mono);font-size:11px;color:var(--accent);width:30px;text-align:right}
@@ -250,7 +250,7 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
 .modal-field input:focus,.modal-field select:focus{outline:none;border-color:var(--accent)}
 .modal-row{display:flex;gap:8px;justify-content:flex-end}
 .modal-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:4px}
-.modal-tab{background:none;border:none;color:var(--muted);padding:8px 14px;font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.modal-tab{background:none;border:none;color:var(--muted);padding:8px 14px;font-family:var(--sans);font-size:14px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
 .modal-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
 .modal-section{display:none}.modal-section.active{display:flex;flex-direction:column;gap:12px}
 .code-box{background:var(--bg);border:1px solid var(--accent);border-radius:6px;padding:14px;text-align:center;font-family:var(--mono);font-size:22px;font-weight:700;letter-spacing:6px;color:var(--accent2)}
@@ -278,7 +278,7 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
 /* (same as before) */
 
 /* TOAST */
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--s2);border:1px solid var(--border);color:var(--text);padding:10px 18px;border-radius:8px;font-size:12px;font-weight:500;z-index:1000;transition:transform .3s;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.4)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--s2);border:1px solid var(--border);color:var(--text);padding:10px 18px;border-radius:8px;font-size:14px;font-weight:500;z-index:1000;transition:transform .3s;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.4)}
 .toast.show{transform:translateX(-50%) translateY(0)}
 
 /* ══ PRINT ══ */
@@ -303,6 +303,7 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
 .tag-parcial{background:rgba(59,130,246,.2);color:#3b82f6;border:1px solid #3b82f6}
 .tag-pagada{background:rgba(34,197,94,.2);color:#22c55e;border:1px solid #22c55e}
 .tag-pendiente{background:rgba(255,140,0,.15);color:#ff8c00;border:1px solid rgba(255,140,0,.4)}
+.tag-cancelada{background:rgba(239,68,68,.2);color:#ef4444;border:1px solid #ef4444}
 .fusion-trace{background:var(--bg2);border:1px solid var(--border);border-left:3px solid #9333ea;border-radius:4px;padding:8px 10px;font-size:11px;color:var(--muted);margin-top:6px}
 .fusion-trace b{color:#9333ea}
 
@@ -311,10 +312,10 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
   html,body{height:auto!important;overflow:visible!important}
   body>*:not(#print-frame){display:none!important}
   #print-frame{display:block!important;position:static!important;background:#fff;width:58mm}
-  #print-frame .ticket-print{width:58mm;font-family:'Courier New',Courier,monospace;font-size:12pt;line-height:1.7;padding:3mm 2mm;color:#000;page-break-after:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #print-frame .ticket-print{width:58mm;font-family:'Courier New',Courier,monospace;font-size:13pt;line-height:1.8;padding:4mm 3mm;color:#000;page-break-after:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   #print-frame .ticket-print *{font-family:'Courier New',Courier,monospace!important;color:#000!important;background:none!important;-webkit-font-smoothing:none;font-smooth:never;font-weight:700!important}
-  #print-frame .ticket-print .t-logo{font-size:15pt!important;font-weight:700!important;letter-spacing:1px}
-  #print-frame .ticket-print .t-orden{font-size:14pt!important;font-weight:700!important}
+  #print-frame .ticket-print .t-logo{font-size:17pt!important;font-weight:700!important;letter-spacing:1px}
+  #print-frame .ticket-print .t-orden{font-size:15pt!important;font-weight:700!important}
   .t-line{border-top:1px dashed #999;margin:3px 0}
   .t-double{border-top:2px solid #000;margin:3px 0}
   #print-frame .ticket-print img{max-width:50mm;height:auto}
@@ -479,6 +480,10 @@ Sin precios también funciona:
 
 <!-- ══ TAB DASHBOARD ══ -->
 <div class="tab-content" id="tab-dashboard">
+  <div style="padding:12px 12px 0;display:flex;gap:8px">
+    <button onclick="abrirCierreCaja()" style="flex:1;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700;font-size:13px">🧾 Cierre de caja</button>
+    <button onclick="iniciarTurno()" style="padding:10px 14px;background:var(--s2);border:1px solid var(--border);color:var(--text);border-radius:8px;cursor:pointer;font-size:12px">⏰ Iniciar turno</button>
+  </div>
   <div id="dashResumenPagos" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;margin:12px 12px 0"></div>
   <div class="dash-layout">
     <div class="dash-grid">
@@ -528,9 +533,9 @@ Sin precios también funciona:
   <div class="modal">
     <div class="modal-title">⚙ Configuración</div>
     <div class="modal-field">
-      <label>🔑 API Key de Groq <span style="color:var(--muted);font-weight:400">(gratis en console.groq.com)</span></label>
+      <label>🔑 API Key de Groq</label>
       <input id="cfgGroqKey" type="password" placeholder="gsk_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
-      <div style="font-size:10px;color:var(--muted);margin-top:3px">1. Entra a <b style="color:var(--accent)">console.groq.com</b> → crea cuenta gratis → API Keys → Create Key<br>2. Pega aquí y guarda.</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:3px">console.groq.com → API Keys → Create Key</div>
     </div>
     <div style="border-top:1px solid var(--border);margin:2px 0"></div>
     <div class="modal-field"><label>Nombre del restaurante</label><input id="cfgResto" placeholder="Burger Manía"></div>
@@ -565,12 +570,33 @@ Sin precios también funciona:
       <div class="danger-title">🔐 Seguridad</div>
       <div style="font-size:11px;color:var(--muted)">Protege la eliminación de comandas con clave de administrador.</div>
       <button class="btn btn-secondary" onclick="abrirClave()" style="font-size:12px;width:100%"><span id="claveEstadoBtn">⚙ Configurar clave de administrador</span></button>
+      <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px">
+        <div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--text)">🧾 Clave del encargado de caja</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:6px">El cajero puede fusionar comandas y registrar pagos, pero no puede editar ni eliminar.</div>
+        <div style="display:flex;gap:6px;margin-bottom:6px">
+          <input type="password" id="cajeroClaveInput" class="meta-input" placeholder="Nueva clave cajero" style="flex:1;font-size:12px" autocomplete="new-password">
+          <button onclick="guardarClaveCajero()" class="btn btn-secondary" style="font-size:11px;padding:6px 12px;background:var(--accent);color:#fff;border:none">Asignar</button>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:10px;font-family:var(--mono)" id="cajeroEstado">\${cfg.cajeroHash?'✅ Clave de cajero activa':'⚪ Sin clave de cajero'}</div>
+          \${cfg.cajeroHash?'<button onclick="quitarClaveCajero()" style="font-size:10px;background:none;border:none;color:var(--red);cursor:pointer">🗑 Quitar clave</button>':''}
+        </div>
+      </div>
     </div>
 
     <div style="border-top:1px solid var(--border);margin:2px 0"></div>
     <div style="display:flex;flex-direction:column;gap:8px">
       <div class="section-label" style="font-size:11px">💾 Backup</div>
       <div style="display:flex;gap:8px">
+        <div style="margin-bottom:8px;border-top:1px solid var(--border);padding-top:8px">
+          <div style="font-size:12px;font-weight:600;margin-bottom:4px">📱 WhatsApp para alertas de edición</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px">Cuando se edite una comanda recibirás un mensaje con los detalles del cambio.</div>
+          <div style="display:flex;gap:6px">
+            <input class="meta-input" id="telDuenoInput" placeholder="Ej: 3001234567" style="flex:1;font-size:12px" value="\${cfg.telDueno||''}">
+            <button onclick="guardarTelDueno()" class="btn btn-secondary" style="font-size:11px;padding:6px 12px;background:var(--accent);color:#fff;border:none">Guardar</button>
+          </div>
+          <div style="font-size:10px;color:var(--muted);margin-top:4px">\${cfg.telDueno?'✅ Número registrado: '+cfg.telDueno:'⚪ Sin número configurado'}</div>
+        </div>
         <button class="btn btn-secondary" onclick="exportarDatos()" style="flex:1;font-size:11px">⬇ Exportar</button>
         <label class="btn btn-secondary" style="flex:1;font-size:11px;cursor:pointer;justify-content:center">⬆ Importar<input type="file" accept=".json" onchange="importarDatos(event)" style="display:none"></label>
       </div>
@@ -645,10 +671,24 @@ Sin precios también funciona:
     </div>
     <div style="font-size:12px;color:var(--muted)" id="pagoComandaInfo">Comanda #0000</div>
 
-    <!-- TOTAL -->
-    <div style="background:var(--bg2);border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
-      <span style="font-size:13px;color:var(--muted)">Total a pagar</span>
-      <span style="font-family:var(--mono);font-size:20px;font-weight:700;color:var(--accent)" id="pagoTotalLabel">$0</span>
+    <!-- TOTAL Y DESCUENTO -->
+    <div style="background:var(--bg2);border-radius:8px;padding:10px 14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-size:13px;color:var(--muted)">Total original</span>
+        <span style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--accent)" id="pagoTotalLabel">$0</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:12px;color:var(--muted)">Descuento %</span>
+        <input type="number" id="pagoDescuento" min="0" max="100" placeholder="0" style="width:70px;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:5px;font-size:13px;text-align:center" oninput="calcularPago()">
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;margin-left:8px">
+          <input type="checkbox" id="pagoCortesia" onchange="calcularPago()" style="width:14px;height:14px">
+          🎁 Cortesía
+        </label>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
+        <span style="font-size:13px;font-weight:600">Total a cobrar</span>
+        <span style="font-family:var(--mono);font-size:20px;font-weight:700;color:var(--green)" id="pagoTotalFinal">$0</span>
+      </div>
     </div>
 
     <!-- MÉTODOS DE PAGO -->
@@ -718,6 +758,9 @@ Sin precios también funciona:
       <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Ítems actuales</div>
       <div id="editarItems" style="display:flex;flex-direction:column;gap:4px"></div>
     </div>
+
+    <!-- SUGERENCIAS FRECUENTES -->
+    <div id="sugerenciasWrap" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px"></div>
 
     <!-- AGREGAR ÍTEM -->
     <div style="border-top:1px solid var(--border);padding-top:10px">
@@ -877,6 +920,15 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 // ══ CONFIG ══
 function openConfig(){
+  // Proteger configuración con clave admin
+  if(cfg.adminHash){
+    const clave=prompt('🔐 Clave de administrador para acceder a Configuración:');
+    if(clave===null) return;
+    if(hashSimple(clave)!==cfg.adminHash){
+      toast('❌ Clave incorrecta. Solo el dueño puede acceder a la configuración.');
+      return;
+    }
+  }
   document.getElementById('cfgGroqKey').value=cfg.groqKey||'';
   document.getElementById('cfgResto').value=cfg.resto||'';
   document.getElementById('cfgEslogan').value=cfg.eslogan||'';
@@ -1183,6 +1235,7 @@ function guardarComanda(){
   }
 
   // Sin mesa abierta — guardar normal
+  registrarItemsFrecuentes(ordenActual.items||[]);
   const comandaParaCocina={...ordenActual, estadoPago:'pendiente', pago:{}};
   comandas.unshift(comandaParaCocina);
   localStorage.setItem('siryx_comandas',JSON.stringify(comandas));
@@ -1217,13 +1270,20 @@ function calcularPago(){
   ids.forEach(id=>{
     const val=parseFloat(document.getElementById(id)?.value)||0;
     ingresado+=val;
-    const row=document.getElementById(id.replace('pago','row').replace('Efectivo','Efectivo').replace('Nequi','Nequi').replace('Daviplata','Daviplata').replace('Breb','Breb').replace('Tarjeta','Tarjeta').replace('Otro','Otro'));
   });
-  const total=ordenActual?.subtotal||0;
-  const pendiente=total-ingresado;
+  const totalOriginal=ordenActual?.subtotal||0;
+  const descPct=parseFloat(document.getElementById('pagoDescuento')?.value)||0;
+  const esCortesia=document.getElementById('pagoCortesia')?.checked||false;
+  const totalFinal = esCortesia ? 0 : Math.round(totalOriginal*(1-descPct/100));
+  if(document.getElementById('pagoTotalFinal'))
+    document.getElementById('pagoTotalFinal').textContent='$'+fmtNum(totalFinal);
+  const pendiente=totalFinal-ingresado;
   document.getElementById('pagoIngresado').textContent='$'+fmtNum(ingresado);
   const pendEl=document.getElementById('pagoPendiente');
-  if(pendiente>0){
+  if(esCortesia){
+    pendEl.textContent='🎁 Cortesía — sin cobro';
+    pendEl.className='pago-pendiente ok';
+  } else if(pendiente>0){
     pendEl.textContent='Pendiente: $'+fmtNum(pendiente);
     pendEl.className='pago-pendiente mal';
   } else if(pendiente<0){
@@ -1258,13 +1318,16 @@ function confirmarPago(){
 function registrarPagoHistorial(idx){
   const comanda = comandas[idx];
   if(!comanda) return;
-  // Si ya tiene pago registrado, pedir clave para modificar
+  // Bloquear si está fusionada
+  if(comanda.estadoPago==='fusionada'){
+    toast('⚠️ Esta comanda está incluida en una fusión. Registra el pago desde la comanda fusionada.');
+    return;
+  }
+  // Verificar permiso de cajero o admin
+  if(!verificarPermisoPago()) return;
+  // Si ya tiene pago registrado, solo admin puede modificar
   if(comanda.estadoPago==='pagado'&&comanda.pago&&Object.keys(comanda.pago).length>0){
-    if(cfg.adminHash){
-      const clave=prompt('🔐 Esta comanda ya fue pagada. Clave de admin para modificar:');
-      if(clave===null) return;
-      if(hashSimple(clave)!==cfg.adminHash){ toast('❌ Clave incorrecta'); return; }
-    }
+    if(!verificarPermisoEdicion()) return;
   }
   // Guardar índice para confirmar después
   window._pagoHistIdx = idx;
@@ -1274,6 +1337,10 @@ function registrarPagoHistorial(idx){
 
 function confirmarPago(){
   if(!ordenActual) return;
+  const descPct=parseFloat(document.getElementById('pagoDescuento')?.value)||0;
+  const esCortesia=document.getElementById('pagoCortesia')?.checked||false;
+  const totalOriginal=ordenActual?.subtotal||0;
+  const totalFinal=esCortesia?0:Math.round(totalOriginal*(1-descPct/100));
   const pago={};
   const metodos=['Efectivo','Nequi','Daviplata','Breb','Tarjeta','Otro'];
   let totalPagado=0;
@@ -1281,12 +1348,17 @@ function confirmarPago(){
     const val=parseFloat(document.getElementById('pago'+m)?.value)||0;
     if(val>0){ pago[m.toLowerCase()]=val; totalPagado+=val; }
   });
-  if(totalPagado===0){ toast('❌ Ingresa al menos un método de pago'); return; }
+  if(!esCortesia&&totalPagado===0){ toast('❌ Ingresa al menos un método de pago'); return; }
+  if(esCortesia){ pago.cortesia=totalOriginal; totalPagado=totalOriginal; }
+  if(descPct>0) pago.descuento=descPct+'%';
 
   // Si viene del historial actualizar esa comanda
   if(window._pagoHistIdx !== undefined){
     comandas[window._pagoHistIdx].pago = pago;
-    comandas[window._pagoHistIdx].estadoPago = 'pagado';
+    comandas[window._pagoHistIdx].estadoPago = esCortesia?'cortesia':'pagado';
+    comandas[window._pagoHistIdx].totalCobrado = totalFinal;
+    comandas[window._pagoHistIdx].descuento = descPct>0?descPct:null;
+    comandas[window._pagoHistIdx].esCortesia = esCortesia||null;
     comandas[window._pagoHistIdx].pagadoEl = new Date().toISOString();
     window._pagoHistIdx = undefined;
   } else {
@@ -1306,15 +1378,79 @@ function confirmarPago(){
 }
 
 
+
+// ══ CLAVE DE CAJERO ══
+function guardarClaveCajero(){
+  const clave=document.getElementById('cajeroClaveInput').value.trim();
+  if(clave.length<4){toast('❌ Mínimo 4 caracteres');return;}
+  if(cfg.adminHash && hashSimple(clave)===cfg.adminHash){toast('❌ No puede ser igual a la clave admin');return;}
+  cfg.cajeroHash=hashSimple(clave);
+  localStorage.setItem('siryx_cfg',JSON.stringify(cfg));
+  document.getElementById('cajeroClaveInput').value='';
+  document.getElementById('cajeroEstado').textContent='✅ Clave de cajero configurada';
+  toast('✅ Clave de cajero guardada');
+}
+
+function quitarClaveCajero(){
+  delete cfg.cajeroHash;
+  localStorage.setItem('siryx_cfg',JSON.stringify(cfg));
+  document.getElementById('cajeroEstado').textContent='Sin clave de cajero';
+  toast('🔓 Clave de cajero eliminada');
+}
+
+function verificarPermisoEdicion(){
+  // Solo admin puede editar
+  if(!cfg.adminHash) return true; // sin clave = libre
+  const clave=prompt('🔐 Clave de administrador para editar:');
+  if(clave===null) return false;
+  if(hashSimple(clave)===cfg.adminHash) return true;
+  toast('❌ Clave incorrecta');
+  return false;
+}
+
+function verificarPermisoFusion(){
+  // Admin o cajero pueden fusionar
+  if(!cfg.adminHash && !cfg.cajeroHash) return true;
+  const clave=prompt('🔐 Clave de administrador o cajero:');
+  if(clave===null) return false;
+  if((cfg.adminHash && hashSimple(clave)===cfg.adminHash)||
+     (cfg.cajeroHash && hashSimple(clave)===cfg.cajeroHash)) return true;
+  toast('❌ Clave incorrecta');
+  return false;
+}
+
+function verificarPermisoPago(){
+  // Admin o cajero pueden registrar pagos
+  if(!cfg.adminHash && !cfg.cajeroHash) return true;
+  const clave=prompt('🔐 Clave de cajero o administrador:');
+  if(clave===null) return false;
+  if((cfg.adminHash && hashSimple(clave)===cfg.adminHash)||
+     (cfg.cajeroHash && hashSimple(clave)===cfg.cajeroHash)) return true;
+  toast('❌ Clave incorrecta');
+  return false;
+}
+
+// ══ NOTIFICACIÓN AL DUEÑO POR EDICIÓN ══
+function notificarDuenoEdicion(comandaId, tipo, detalle){
+  const telDueno=(cfg.telDueno||'').replace(/\D/g,'');
+  if(!telDueno) return;
+  const resto=cfg.resto||'el restaurante';
+  const hora=new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
+  const fecha=new Date().toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit',year:'numeric'});
+  let msg='⚠️ *SiryX Comandas — Alerta de '+tipo+'*\n\n';
+  msg+='🏪 Restaurante: *'+resto+'*\n';
+  msg+='🧾 Comanda: *#'+comandaId+'*\n';
+  msg+='📅 Fecha: '+fecha+' a las '+hora+'\n';
+  if(detalle) msg+='📝 Detalle: '+detalle+'\n';
+  msg+='\n_Verifica el historial en la app para más información._';
+  window.open('https://wa.me/57'+telDueno+'?text='+encodeURIComponent(msg),'_blank');
+}
+
 // ══ EDITAR COMANDA ══
 let _editIdx = null;
 
 function editarComanda(idx){
-  if(cfg.adminHash){
-    const clave=prompt('🔐 Clave de administrador para editar:');
-    if(clave===null) return;
-    if(hashSimple(clave)!==cfg.adminHash){ toast('❌ Clave incorrecta'); return; }
-  }
+  if(!verificarPermisoEdicion()) return;
   const cmd = comandas[idx];
   if(!cmd) return;
   _editIdx = idx;
@@ -1331,6 +1467,7 @@ function editarComanda(idx){
   ).join('');
 
   document.getElementById('modalEditar').style.display='flex';
+  setTimeout(renderSugerencias,100);
 }
 
 function quitarItemEditar(itemIdx){
@@ -1370,6 +1507,13 @@ function guardarEdicion(){
   renderHistorial();
   renderDashboard();
   toast('✅ Comanda actualizada');
+  // Notificar al dueño con detalle
+  const cmdEditada=comandas[_editIdx];
+  if(cmdEditada){
+    const items=cmdEditada.items||[];
+    const detalle='Items: '+items.length+' | Total: $'+(cmdEditada.subtotal?fmtNum(cmdEditada.subtotal):'sin precio')+(cmdEditada.notas?' | Notas: '+cmdEditada.notas:'');
+    notificarDuenoEdicion(cmdEditada.id,'EDICIÓN',detalle);
+  }
 }
 
 function cerrarModalEditar(){
@@ -1382,11 +1526,7 @@ let _fusionBase = null;
 let _fusionSeleccionadas = new Set();
 
 function abrirFusionar(idx){
-  if(cfg.adminHash){
-    const clave=prompt('🔐 Clave de administrador para fusionar:');
-    if(clave===null) return;
-    if(hashSimple(clave)!==cfg.adminHash){ toast('❌ Clave incorrecta'); return; }
-  }
+  if(!verificarPermisoFusion()) return;
   _fusionBase = idx;
   _fusionSeleccionadas = new Set([idx]);
   const lista = document.getElementById('fusionarLista');
@@ -1490,6 +1630,137 @@ function cerrarModalFusionar(){
   _fusionSeleccionadas=new Set();
 }
 
+
+function cancelarComanda(idx){
+  if(cfg.adminHash){
+    const clave=prompt('🔐 Clave de administrador para cancelar:');
+    if(clave===null) return;
+    if(hashSimple(clave)!==cfg.adminHash){toast('❌ Clave incorrecta');return;}
+  }
+  const motivo=prompt('Motivo de cancelación (opcional):');
+  if(motivo===null) return;
+  comandas[idx].estadoPago='cancelada';
+  comandas[idx].canceladoEl=new Date().toISOString();
+  comandas[idx].motivoCancelacion=motivo||'Sin motivo';
+  localStorage.setItem('siryx_comandas',JSON.stringify(comandas));
+  renderHistorial();
+  renderDashboard();
+  toast('❌ Comanda #'+comandas[idx].id+' cancelada');
+  // Notificar al dueño
+  notificarDuenoEdicion(comandas[idx].id,'CANCELACIÓN','Motivo: '+(motivo||'Sin motivo'));
+}
+
+// ══ PRODUCTOS FRECUENTES ══
+function registrarItemsFrecuentes(items){
+  if(!items||!items.length) return;
+  const freq=JSON.parse(localStorage.getItem('siryx_frecuentes')||'{}');
+  items.forEach(item=>{
+    const k=item.nombre.toLowerCase().trim();
+    freq[k]=(freq[k]||0)+1;
+  });
+  localStorage.setItem('siryx_frecuentes',JSON.stringify(freq));
+}
+
+function getSugerencias(texto){
+  const freq=JSON.parse(localStorage.getItem('siryx_frecuentes')||'{}');
+  const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  if(!texto) return sorted.map(([k])=>k);
+  return sorted.map(([k])=>k).filter(k=>k.includes(texto.toLowerCase()));
+}
+
+function renderSugerencias(){
+  const freq=JSON.parse(localStorage.getItem('siryx_frecuentes')||'{}');
+  const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const el=document.getElementById('sugerenciasWrap');
+  if(!el||!sorted.length) return;
+  el.innerHTML='<div style="font-size:10px;color:var(--muted);margin-bottom:4px;font-family:var(--mono)">🔥 MÁS PEDIDOS</div>'+
+    sorted.map(([k,v])=>{
+      const btn=document.createElement('button');
+      btn.textContent=k+' ('+v+')';
+      btn.style.cssText='background:var(--s2);border:1px solid var(--border);color:var(--text);padding:4px 10px;border-radius:12px;font-size:11px;cursor:pointer';
+      btn.addEventListener('click',function(){ agregarSugerencia(k); });
+      btn.addEventListener('mouseover',function(){ btn.style.borderColor='var(--accent)'; });
+      btn.addEventListener('mouseout',function(){ btn.style.borderColor='var(--border)'; });
+      el.appendChild(btn);
+  });
+}
+
+function agregarSugerencia(nombre){
+  const el=document.getElementById('editarNuevoItem');
+  if(el){ el.value=nombre; el.focus(); }
+}
+
+// ══ CIERRE DE CAJA ══
+function abrirCierreCaja(){
+  const hoyStr=new Date().toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const cmdHoy=comandas.filter(function(cmd){ return cmd.fecha===hoyStr&&cmd.estadoPago!=='cancelada'&&cmd.estadoPago!=='fusionada'; });
+  const cmdPagadas=cmdHoy.filter(function(cmd){ return cmd.estadoPago==='pagado'||cmd.estadoPago==='cortesia'||(cmd.pago&&Object.keys(cmd.pago||{}).length>0); });
+  const cmdPendientes=cmdHoy.filter(function(cmd){ return !cmd.estadoPago||cmd.estadoPago==='pendiente'; });
+  const cmdCanceladas=comandas.filter(function(cmd){ return cmd.fecha===hoyStr&&cmd.estadoPago==='cancelada'; });
+  const cmdCortesias=cmdHoy.filter(function(cmd){ return cmd.estadoPago==='cortesia'||cmd.pago&&cmd.pago.cortesia; });
+  const metodos={};
+  let totalVentas=0;
+  const metIconos={efectivo:'💵',nequi:'🟣',daviplata:'🔴',breb:'🔵',tarjeta:'💳',otro:'💸'};
+  cmdPagadas.forEach(function(cmd){
+    if(cmd.pago) Object.entries(cmd.pago).forEach(function(e){ const m=e[0],v=e[1]; if(m!=='descuento'&&m!=='cortesia'&&typeof v==='number'){metodos[m]=(metodos[m]||0)+v;totalVentas+=v;} });
+  });
+  const ticketProm=cmdPagadas.length>0?Math.round(totalVentas/cmdPagadas.length):0;
+  const resto=cfg.nombreResto||'Restaurante';
+  const turnoInicio=cfg.turnoInicio||'No registrado';
+
+  let texto='CIERRE DE CAJA — '+hoyStr+'\n';
+  texto+=resto+'\n';
+  texto+='Turno desde: '+turnoInicio+'\n\n';
+  texto+='RESUMEN\n';
+  texto+='Comandas totales: '+cmdHoy.length+'\n';
+  texto+='Pagadas: '+cmdPagadas.length+'\n';
+  texto+='Pendientes: '+cmdPendientes.length+'\n';
+  texto+='Canceladas: '+cmdCanceladas.length+'\n';
+  texto+='Cortesías: '+cmdCortesias.length+'\n\n';
+  texto+='INGRESOS POR MÉTODO\n';
+  Object.entries(metodos).forEach(function(e){ texto+=(metIconos[e[0]]||'💸')+' '+e[0]+': $'+fmtNum(e[1])+'\n'; });
+  texto+='\nTOTAL: $'+fmtNum(totalVentas)+'\n';
+  texto+='Ticket promedio: $'+fmtNum(ticketProm);
+
+  const waText='🧾 *CIERRE DE CAJA — '+hoyStr+'*\n🏪 '+resto+'\n💰 *TOTAL: $'+fmtNum(totalVentas)+'*\n'+Object.entries(metodos).map(function(e){ return (metIconos[e[0]]||'💸')+' '+e[0]+': $'+fmtNum(e[1]); }).join('\n');
+
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:700;display:flex;align-items:center;justify-content:center;padding:16px';
+  const box=document.createElement('div');
+  box.style.cssText='background:var(--bg);border:1px solid var(--border);border-top:3px solid var(--accent);border-radius:10px;padding:20px;width:100%;max-width:380px;display:flex;flex-direction:column;gap:12px';
+  box.innerHTML='<div style="font-size:16px;font-weight:700;display:flex;justify-content:space-between;align-items:center">🧾 Cierre de caja<button style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer">✕</button></div>'
+    +'<pre style="background:var(--s2);border-radius:6px;padding:12px;font-size:12px;font-family:var(--mono);white-space:pre-wrap;line-height:1.7;max-height:280px;overflow-y:auto">'+texto+'</pre>'
+    +'<div style="display:flex;gap:8px">'
+    +'<button id="btnCerrarCierre" style="flex:1;padding:10px;background:none;border:1px solid var(--border);color:var(--text);border-radius:7px;cursor:pointer">Cerrar</button>'
+    +'<button id="btnEnviarCierre" style="flex:2;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:7px;cursor:pointer;font-weight:700">📱 Enviar por WA</button>'
+    +'</div>'
+    +'<button id="btnNuevoTurno" style="padding:10px;background:var(--s2);border:1px solid var(--border);color:var(--text);border-radius:7px;cursor:pointer;font-size:12px">⏰ Iniciar nuevo turno</button>';
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  box.querySelector('button').addEventListener('click',function(){ overlay.remove(); });
+  document.getElementById('btnCerrarCierre').addEventListener('click',function(){ overlay.remove(); });
+  document.getElementById('btnEnviarCierre').addEventListener('click',function(){
+    const tel=(cfg.telDueno||'').replace(/\D/g,'');
+    window.open('https://wa.me/'+(tel?'57'+tel:'')+'?text='+encodeURIComponent(waText),'_blank');
+  });
+  document.getElementById('btnNuevoTurno').addEventListener('click',function(){
+    iniciarTurno(); overlay.remove();
+  });
+}
+
+
+function enviarCierreWA(reporte){
+  const tel=(cfg.telDueno||'').replace(/\D/g,'');
+  const url='https://wa.me/'+(tel?'57'+tel:'')+'?text='+reporte;
+  window.open(url,'_blank');
+}
+
+function iniciarTurno(){
+  const hora=new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
+  cfg.turnoInicio=hora;
+  localStorage.setItem('siryx_cfg',JSON.stringify(cfg));
+  toast('⏰ Turno iniciado a las '+hora);
+}
 function toggleBTHelp(){ document.getElementById('btHelp').classList.toggle('open'); }
 
 // ══ HISTORIAL ══
@@ -1951,7 +2222,7 @@ function iniciarApp(){
   document.getElementById('histBadge').textContent=comandas.length;
   initSplash();
   setTimeout(renderDashboard, 2100);
-  if(!cfg.groqKey){ setTimeout(()=>showStatus('👋 Configura tu API Key de Groq gratis en ⚙ para empezar','info'),2200); }
+  if(!cfg.groqKey){ setTimeout(()=>showStatus('👋 Configura tu API Key de Groq en ⚙ para empezar','info'),2200); }
 }
 
 // ══ INIT ══
