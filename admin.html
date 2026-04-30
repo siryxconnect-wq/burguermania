@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SiryX Admin Center | Control de Licencias</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <!-- Supabase JS Library -->
+    <!-- Supabase & Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --bg: #050608;
@@ -269,9 +270,9 @@
         <div class="logo"><div class="logo-dot"></div> SiryX <span>Admin</span></div>
         <div class="nav-group">
             <span class="nav-label">Gestión</span>
-            <a href="#" class="nav-item active">Restaurantes</a>
-            <a href="#" class="nav-item">Suscripciones</a>
-            <a href="#" class="nav-item">Estadísticas</a>
+            <a href="#" class="nav-item active" onclick="showView('restaurantes', this)">Restaurantes</a>
+            <a href="#" class="nav-item" onclick="showView('suscripciones', this)">Suscripciones</a>
+            <a href="#" class="nav-item" onclick="showView('estadisticas', this)">Estadísticas</a>
         </div>
         <div class="nav-group" style="margin-top: auto;">
             <span class="nav-label">Sistema</span>
@@ -281,46 +282,83 @@
     </aside>
 
     <main>
-        <header>
+        <header id="mainHeader">
             <div class="header-info">
-                <h1>Panel de Licencias</h1>
-                <p>Monitorea y gestiona el acceso de tus clientes en tiempo real.</p>
+                <h1 id="viewTitle">Panel de Licencias</h1>
+                <p id="viewDesc">Monitorea y gestiona el acceso de tus clientes en tiempo real.</p>
             </div>
-            <button class="btn btn-primary" onclick="openModal()">
+            <button class="btn btn-primary" onclick="openModal()" id="btnAddClient">
                 <span>+</span> Registrar Nuevo Local
             </button>
         </header>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <span class="stat-label">Locales Activos</span>
-                <div class="stat-value" id="statActive">0</div>
+        <!-- VISTA RESTAURANTES (La actual) -->
+        <div id="view-restaurantes" class="view-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-label">Locales Activos</span>
+                    <div class="stat-value" id="statActive">0</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Por Vencer</span>
+                    <div class="stat-value" id="statPending" style="color: var(--orange);">0</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Facturación Mensual</span>
+                    <div class="stat-value" id="statRevenue">$0</div>
+                </div>
             </div>
-            <div class="stat-card">
-                <span class="stat-label">Por Vencer</span>
-                <div class="stat-value" id="statPending" style="color: var(--orange);">0</div>
-            </div>
-            <div class="stat-card">
-                <span class="stat-label">Facturación Mensual</span>
-                <div class="stat-value" id="statRevenue">$0</div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Restaurante</th>
+                            <th>Estado de Licencia</th>
+                            <th>Vencimiento</th>
+                            <th>Plan Mensual</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clientTableBody">
+                        <!-- JS carga contenido -->
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Restaurante</th>
-                        <th>Estado de Licencia</th>
-                        <th>Vencimiento</th>
-                        <th>Plan Mensual</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="clientTableBody">
-                    <!-- JS carga contenido -->
-                </tbody>
-            </table>
+        <!-- VISTA ESTADÍSTICAS -->
+        <div id="view-estadisticas" class="view-content" style="display: none;">
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+                <div class="stat-card" style="height: 400px;">
+                    <span class="stat-label">Proyección de Ingresos</span>
+                    <canvas id="revenueChart"></canvas>
+                </div>
+                <div class="stat-card" style="height: 400px;">
+                    <span class="stat-label">Distribución de Clientes</span>
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- VISTA SUSCRIPCIONES -->
+        <div id="view-suscripciones" class="view-content" style="display: none;">
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Plan</th>
+                            <th>Último Pago</th>
+                            <th>Siguiente Cobro</th>
+                            <th>Prioridad</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subsTableBody">
+                        <!-- JS carga contenido -->
+                    </tbody>
+                </table>
+            </div>
         </div>
     </main>
 
@@ -566,41 +604,3 @@
             t.textContent = msg;
             t.classList.add('show');
             setTimeout(() => t.classList.remove('show'), 3000);
-        }
-
-        // ══ GENERACIÓN DE LLAVES ══
-        const LICENSE_SECRET = 'SiryX2024$Connect#';
-        
-        function hashLicencia(str){
-            let h = 5381;
-            for(let i=0;i<str.length;i++) h=((h<<5)+h)^str.charCodeAt(i);
-            return Math.abs(h);
-        }
-
-        function generarClaveFechas(clienteId, fechaInicio, fechaFin){
-            const dIni = Math.floor(new Date(fechaInicio).getTime() / 86400000);
-            const dFin = Math.floor(new Date(fechaFin).getTime()   / 86400000);
-            const encIni = dIni.toString(36).toUpperCase().padStart(4,'0');
-            const encFin = dFin.toString(36).toUpperCase().padStart(4,'0');
-            const seed = `${LICENSE_SECRET}|${clienteId.toLowerCase().trim()}|${dIni}|${dFin}`;
-            const h = hashLicencia(seed);
-            const check = ('000'+(h%9999+1000)).slice(-4);
-            return `${encIni}-${encFin}-${check}`.toUpperCase();
-        }
-
-        function verLlave(index) {
-            const client = clients[index];
-            const fechaHoy = new Date().toISOString();
-            const fechaFin = new Date(client.expiry_date).toISOString();
-            const clave = generarClaveFechas(client.id, fechaHoy, fechaFin);
-            
-            // Mostrar al usuario para copiar
-            const msg = `🏢 Cliente: ${client.name}\n🆔 ID de Cliente: ${client.id}\n🔑 Llave de Activación:\n\n${clave}\n\n(Copia el ID y la Llave y pégalos en la aplicación principal para desbloquearla).`;
-            alert(msg);
-        }
-
-        // Inicio
-        fetchClients();
-    </script>
-</body>
-</html>
