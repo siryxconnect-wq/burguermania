@@ -438,6 +438,7 @@
                     <td class="date-cell">$${new Intl.NumberFormat().format(c.price)}</td>
                     <td>
                         <div class="actions-cell">
+                            <button class="btn btn-sm btn-primary" onclick="verLlave(${index})" style="padding:6px 10px; background:var(--accent); border:none; color:white">🔑 Generar Llave</button>
                             <button class="btn btn-sm btn-outline" onclick="extendLicense(${index})">➕ 30 días</button>
                             <button class="btn btn-sm btn-outline" onclick="toggleStatus(${index})" style="color: ${diffDays > 0 ? 'var(--red)' : 'var(--green)'};">
                                 ${diffDays > 0 ? '🚫 Bloquear' : '🔓 Activar'}
@@ -565,6 +566,37 @@
             t.textContent = msg;
             t.classList.add('show');
             setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // ══ GENERACIÓN DE LLAVES ══
+        const LICENSE_SECRET = 'SiryX2024$Connect#';
+        
+        function hashLicencia(str){
+            let h = 5381;
+            for(let i=0;i<str.length;i++) h=((h<<5)+h)^str.charCodeAt(i);
+            return Math.abs(h);
+        }
+
+        function generarClaveFechas(clienteId, fechaInicio, fechaFin){
+            const dIni = Math.floor(new Date(fechaInicio).getTime() / 86400000);
+            const dFin = Math.floor(new Date(fechaFin).getTime()   / 86400000);
+            const encIni = dIni.toString(36).toUpperCase().padStart(4,'0');
+            const encFin = dFin.toString(36).toUpperCase().padStart(4,'0');
+            const seed = `${LICENSE_SECRET}|${clienteId.toLowerCase().trim()}|${dIni}|${dFin}`;
+            const h = hashLicencia(seed);
+            const check = ('000'+(h%9999+1000)).slice(-4);
+            return `${encIni}-${encFin}-${check}`.toUpperCase();
+        }
+
+        function verLlave(index) {
+            const client = clients[index];
+            const fechaHoy = new Date().toISOString();
+            const fechaFin = new Date(client.expiry_date).toISOString();
+            const clave = generarClaveFechas(client.id, fechaHoy, fechaFin);
+            
+            // Mostrar al usuario para copiar
+            const msg = `🏢 Cliente: ${client.name}\n🆔 ID de Cliente: ${client.id}\n🔑 Llave de Activación:\n\n${clave}\n\n(Copia el ID y la Llave y pégalos en la aplicación principal para desbloquearla).`;
+            alert(msg);
         }
 
         // Inicio
