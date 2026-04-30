@@ -386,30 +386,7 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
 </head>
 <body>
 
-<!-- ACTIVACIÓN -->
-<div id="activationScreen">
-  <div class="act-logo">SiryX</div>
-  <div class="act-sub">Comandas</div>
-  <div class="act-box">
-    <div class="act-title">🔑 Activación de licencia</div>
-    <div class="act-msg">Ingresa tu ID de cliente y la clave que te envió SiryX Connect.</div>
-    <div id="actEstado"></div>
-    <div id="actIdWrap">
-      <div style="font-size:10px;color:var(--muted);text-align:left;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">ID de cliente</div>
-      <input class="act-input" id="actClienteId" placeholder="ej: burger_mania" maxlength="40" autocomplete="off" style="letter-spacing:1px;font-size:14px;text-transform:lowercase" onkeydown="if(event.key==='Enter')document.getElementById('actInput').focus()">
-    </div>
-    <div>
-      <div style="font-size:10px;color:var(--muted);text-align:left;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Clave de activación</div>
-      <input class="act-input" id="actInput" placeholder="XXXX-XXXX-XXXX" maxlength="14" autocomplete="off" onkeydown="if(event.key==='Enter')verificarLicencia()">
-    </div>
-    <div class="act-err" id="actErr"></div>
-    <button class="act-btn" onclick="verificarLicencia()">Activar →</button>
-    <div class="act-info">
-      ¿No tienes tu clave? Contáctanos:<br>
-      <b style="color:var(--accent)">WhatsApp 320 369 4094</b>
-    </div>
-  </div>
-</div>
+<!-- Pantalla de Activación Elite (Cargada al final) -->
 
 <!-- SPLASH -->
 <div id="splash">
