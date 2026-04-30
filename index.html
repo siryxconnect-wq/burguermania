@@ -692,17 +692,15 @@ Reglas ítems:-unit_price:número entero COP sin puntos.Sin precio → 0
 -subtotal:suma qty*unit_price
 -Agrupa ítems idénticos
 -Precios:18000,18.000,$18000,18k,18 mil,c/u`;try{// Verificar licencia remota del restaurante
-if(window.SIRYX_CONFIG&&window.SIRYX_CONFIG.gymId&&window.SIRYX_CONFIG.gymKey){
-  const _licOk=verificarLicenciaRemota(window.SIRYX_CONFIG.gymId,window.SIRYX_CONFIG.gymKey);
-  if(!_licOk) mostrarBloqueoComandas();
-}
+// Verificar licencia — bloquear si no hay clave, está vacía o vencida
 if(window.SIRYX_CONFIG){
-  const _gid=window.SIRYX_CONFIG.gymId||'';
-  const _gkey=window.SIRYX_CONFIG.gymKey||'';
+  const _gid=(window.SIRYX_CONFIG.gymId||'').trim();
+  const _gkey=(window.SIRYX_CONFIG.gymKey||'').trim();
   if(!_gid||!_gkey||!verificarLicenciaRemota(_gid,_gkey)){
     mostrarBloqueoComandas();
   }
 } else {
+  // Sin config.js — bloquear
   mostrarBloqueoComandas();
 }
 const GROQ_KEY=(window.SIRYX_CONFIG&&window.SIRYX_CONFIG.groqKey)||cfg.groqKey||'';const groqKey=GROQ_KEY;const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${groqKey}`},body:JSON.stringify({model:'llama-3.1-8b-instant',max_tokens:1200,temperature:0.1,messages:[{role:'system',content:'Eres un sistema de comandas para restaurante colombiano. Responde ÚNICAMENTE con JSON válido, sin backticks, sin texto adicional.'},{role:'user',content:prompt}]})});const data=await res.json();if(data.error)throw new Error(data.error.message||'Error de API');const raw=data.choices?.[0]?.message?.content||'';const clean=raw.replace(/```json|```/g,'').trim();const parsed=JSON.parse(clean);const now=new Date();const fecha=now.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit',year:'numeric'});const hora=now.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});const mesaFinal=mesa||parsed.mesa||'';const meseroFinal=mesero||parsed.mesero||'';const tipoFinal=(tipo&&tipo!=='MESA')?tipo:(parsed.tipo||'MESA');if(!mesa&&parsed.mesa)document.getElementById('metaMesa').value=parsed.mesa;if(!mesero&&parsed.mesero)document.getElementById('metaMesero').value=parsed.mesero;if((!tipo||tipo==='MESA')&&parsed.tipo&&parsed.tipo!=='MESA')document.getElementById('metaTipo').value=parsed.tipo;ordenActual={id:numOrden,resto,mesa:mesaFinal,mesero:meseroFinal,tipo:tipoFinal,notas,items:parsed.items,tiene_precios:parsed.tiene_precios||false,subtotal:parsed.subtotal||0,resumen:parsed.resumen||'',fecha,hora,timestamp:now.toISOString()};renderTicket(ordenActual);playPrintSound();const tw=document.getElementById('ticketPreview');tw.classList.remove('animating');void tw.offsetWidth;tw.classList.add('animating');document.getElementById('ticketNumLabel').textContent=`#${numOrden}`;['btnImprimir','btnCopiarBT','btnGuardar'].forEach(id=>document.getElementById(id).disabled=false);const extras=[];if(parsed.mesa)extras.push(`📍 ${parsed.mesa}`);if(parsed.mesero)extras.push(`👤 ${parsed.mesero}`);if(parsed.tipo&&parsed.tipo!=='MESA')extras.push(parsed.tipo);const extraStr=extras.length?`· ${extras.join(' · ')}`:'';const pMsg=parsed.tiene_precios?`${parsed.items.length}ítem(s)— ${fmtNum(parsed.subtotal)}${extraStr}`:`${parsed.items.length}ítem(s)${extraStr}`;showStatus(`Comanda lista:${pMsg}`,'ok');}catch(e){if(e.message&&e.message.includes('401'))showStatus('API Key inválida. Verifica en ⚙','err');else showStatus('Error al procesar. Revisa el texto e intenta de nuevo.','err');console.error(e);}
@@ -761,7 +759,7 @@ return fp;}
 const LICENSE_SECRET='SiryX2024$Connect#';function hashLicencia(str){let h=5381;for(let i=0;i<str.length;i++)h=((h<<5)+h)^str.charCodeAt(i);return Math.abs(h);}
 function generarClaveMes(clienteId,mes,anio){const seed=`${LICENSE_SECRET}|${clienteId.toLowerCase().trim()}|${mes}|${anio}`;const h=hashLicencia(seed);const part1=('000'+(h%9999+1000)).slice(-4);const part2=('000'+((h>>4)%9999+1000)).slice(-4);const part3=('000'+((h>>8)%9999+1000)).slice(-4);return`${part1}-${part2}-${part3}`.toUpperCase();}
 function generarClaveFechas(clienteId,fechaInicio,fechaFin){const seed=`|${clienteId.toLowerCase().trim()}|${fechaInicio}|${fechaFin}`;const h=hashLicencia(seed);const part1=("000"+(h%9999+1000)).slice(-4);const part2=("000"+((h>>4)%9999+1000)).slice(-4);const part3=("000"+((h>>8)%9999+1000)).slice(-4);return`${part1}-${part2}-${part3}`.toUpperCase();}
-function generarClaveFechas(clienteId,fechaInicio,fechaFin){const dIni=Math.floor(new Date(fechaInicio).getTime()/86400000);const dFin=Math.floor(new Date(fechaFin).getTime()/86400000);const encIni=dIni.toString(36).toUpperCase().padStart(4,'0');const encFin=dFin.toString(36).toUpperCase().padStart(4,'0');const seed=`${LICENSE_SECRET}|${clienteId.toLowerCase().trim()}|${dIni}|${dFin}`;const h=hashLicencia(seed);const check=('000'+(h%9999+1000)).slice(-4);return`${encIni}-${encFin}-${check}`.toUpperCase();}
+
 function decodificarClave(clave,clienteId){try{const parts=clave.trim().toUpperCase().split('-');if(parts.length!==3)return null;const dIni=parseInt(parts[0],36);const dFin=parseInt(parts[1],36);const checkIngresado=parts[2];const seed=`${LICENSE_SECRET}|${clienteId.toLowerCase().trim()}|${dIni}|${dFin}`;const h=hashLicencia(seed);const checkEsperado=('000'+(h%9999+1000)).slice(-4);if(checkIngresado!==checkEsperado)return null;const fechaInicio=new Date(dIni*86400000).toISOString().slice(0,10);const fechaFin=new Date(dFin*86400000).toISOString().slice(0,10);return{fechaInicio,fechaFin,dIni,dFin};}catch(e){return null;}}
 function verificarLicencia(){const input=document.getElementById('actInput').value.trim().toUpperCase();const errEl=document.getElementById('actErr');errEl.textContent='';if(!input){errEl.textContent='Ingresa la clave de activación';return;}
 const idIngresado=document.getElementById('actClienteId')?document.getElementById('actClienteId').value.trim().toLowerCase():'';if(!cfg.clienteId&&!idIngresado){errEl.textContent='Ingresa tu ID de cliente';document.getElementById('actClienteId').focus();return;}
