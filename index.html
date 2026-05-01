@@ -408,12 +408,38 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
     </div>
 </div>
 
+<!-- Pantalla de Activación Elite -->
+<div id="activationOverlay" style="position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: none; align-items: center; justify-content: center; backdrop-filter: blur(20px); background-image: radial-gradient(circle at 20% 20%, rgba(79,70,229,0.15) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(14,165,233,0.1) 0%, transparent 50%);">
+    <div style="background: rgba(10,12,18,0.8); border: 1px solid rgba(255,255,255,0.1); padding: 48px; border-radius: 32px; width: 100%; max-width: 420px; text-align: center; backdrop-filter: blur(40px); box-shadow: 0 40px 100px rgba(0,0,0,0.8);">
+        <div style="font-size: 40px; font-weight: 800; margin-bottom: 8px; color: #fff; letter-spacing: -2px;">SiryX<span style="color: var(--accent);">.</span></div>
+        <div style="font-size: 13px; color: var(--muted); margin-bottom: 36px; line-height: 1.6;">Ingresa los datos de tu licencia para<br>desbloquear el sistema Elite.</div>
+        
+        <div style="text-align: left; margin-bottom: 20px;">
+            <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; color: var(--muted); display: block; margin-bottom: 8px;">ID de Restaurante</label>
+            <input type="text" id="actClienteId" placeholder="Ej: rx613" autocomplete="off"
+                style="width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 16px; border-radius: 14px; color: #fff; outline: none; font-size: 16px; font-family: monospace; letter-spacing: 2px; text-transform: lowercase;"
+                onkeydown="if(event.key==='Enter') document.getElementById('actInput').focus()">
+        </div>
+
+        <div style="text-align: left; margin-bottom: 32px;">
+            <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; color: var(--muted); display: block; margin-bottom: 8px;">Clave de Activación</label>
+            <input type="text" id="actInput" placeholder="XXXX-XXXX-XXXX" maxlength="14" autocomplete="off"
+                style="width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 16px; border-radius: 14px; color: #fff; outline: none; font-size: 18px; font-family: monospace; letter-spacing: 4px; text-align: center; text-transform: uppercase;"
+                onkeydown="if(event.key==='Enter') verificarLicencia()">
+            <div id="actErr" style="color: var(--red); font-size: 12px; margin-top: 10px; font-weight: 600; min-height: 18px;"></div>
+        </div>
+
+        <button onclick="verificarLicencia()" style="width: 100%; padding: 18px; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border: none; border-radius: 16px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: var(--sans); letter-spacing: 0.5px; box-shadow: 0 8px 30px rgba(79,70,229,0.4); transition: all 0.2s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+            Activar Sistema Elite
+        </button>
+        <div style="margin-top: 24px; font-size: 11px; color: var(--muted);">¿No tienes tu clave? WhatsApp <b style="color: var(--accent2);">320 369 4094</b></div>
+    </div>
+</div>
+
 <!-- SPLASH -->
 <div id="splash">
-  <div id="splashLogoWrap"></div>
-  <div class="splash-logo" id="splashTitle">SiryX</div>
+  <div class="splash-logo">SiryX</div>
   <div class="splash-sub">Comandas</div>
-  <div class="splash-resto" id="splashResto"></div>
   <div class="splash-bar"><div class="splash-progress"></div></div>
 </div>
 
@@ -2357,22 +2383,15 @@ function checkLicencia(){
   const gracia = new Date(expira);
   gracia.setDate(gracia.getDate()+3);
 
-  if(now > gracia) return false; // Bloqueado definitivamente
-
-  // Verificar que la clave del mes guardado sigue siendo válida
-  const claveGuardada = generarClaveMes(lic.clienteId, lic.mes, lic.anio);
-  return true; // Si llegó hasta aquí, está activa
+    if(now > gracia) return false;
+  return true;
 }
 
 function mostrarEstadoLicencia(){
-  // Si ya tiene ID guardado, ocultarlo y mostrarlo como info
   const idWrap = document.getElementById('actIdWrap');
   const idInput = document.getElementById('actClienteId');
   if(cfg.clienteId && idWrap && idInput){
     idInput.value = cfg.clienteId;
-    idWrap.style.opacity = '0.5';
-    const lbl = idWrap.querySelector('div');
-    if(lbl) lbl.textContent = \`ID: \${cfg.clienteId}\`;
   }
   const lic = cfg.licencia;
   const estadoEl = document.getElementById('actEstado');
@@ -2382,14 +2401,9 @@ function mostrarEstadoLicencia(){
     const expira = new Date(lic.expira);
     const now = new Date();
     const diasRestantes = Math.ceil((expira-now)/(1000*60*60*24));
-
-    if(diasRestantes > 5){
-      estadoEl.innerHTML=\`<div class="act-ok">✅ Licencia activa — vence el \${expira.toLocaleDateString('es-CO')}</div>\`;
-    } else if(diasRestantes > 0){
-      estadoEl.innerHTML=\`<div class="act-warn">⚠️ Licencia vence en \${diasRestantes} día(s) — renueva con SiryX Connect</div>\`;
-    } else {
-      estadoEl.innerHTML=\`<div class="act-warn" style="color:var(--red)">❌ Licencia vencida — ingresa la nueva clave</div>\`;
-    }
+    if(diasRestantes > 5) estadoEl.innerHTML=`<div class="act-ok">✅ Licencia activa — vence el ${expira.toLocaleDateString('es-CO')}</div>`;
+    else if(diasRestantes > 0) estadoEl.innerHTML=`<div class="act-warn">⚠️ Vence en ${diasRestantes} días</div>`;
+    else estadoEl.innerHTML=`<div class="act-warn" style="color:var(--red)">❌ Licencia vencida</div>`;
   }
 }
 
@@ -2412,6 +2426,18 @@ function iniciarApp(){
   setTimeout(() => { if(typeof renderDashboard === 'function') renderDashboard(); }, 2100);
 }
 
-// ══ INIT ══
 document.addEventListener('DOMContentLoaded', () => {
   applyTheme();
+  if(checkLicencia()){
+    iniciarApp();
+  } else {
+    setTimeout(() => {
+      const s = document.getElementById('splash');
+      if(s) { s.classList.add('hiding'); setTimeout(() => s.style.display = 'none', 600); }
+      const overlay = document.getElementById('activationOverlay');
+      if(overlay) overlay.style.display = 'flex';
+      mostrarEstadoLicencia();
+    }, 1500);
+  }
+});
+</script>
