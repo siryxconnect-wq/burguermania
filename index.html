@@ -2202,6 +2202,11 @@ const SUPABASE_URL = 'https://nlicutwfjntcsgxocjaz.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_zWFZkQ3w4CtLntMB9vN_0Q_Hnva-UxR';
 const dbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// ══ VARIABLES GLOBALES ══
+let cfg = JSON.parse(localStorage.getItem('siryx_cfg') || '{"clienteId":"","licencia":{}}');
+let comandas = JSON.parse(localStorage.getItem('siryx_comandas') || '[]');
+let chartSemana, chartHoras, chartComparativo; // Referencias para los gráficos
+
 // ══ SISTEMA DE LICENCIA ══
 // Clave secreta compartida entre keygen y app (no visible para el usuario final)
 const LICENSE_SECRET = 'SiryX2024$Connect#';
@@ -2412,8 +2417,3 @@ if(checkLicencia()){
             <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 16px; font-size: 15px; border-radius: 14px;" onclick="verificarLicencia()">
                 Activar Sistema Elite
             </button>
-            <div style="margin-top: 24px; font-size: 10px; color: var(--muted); letter-spacing: 1px;">© 2026 SiryX Connect · SaaS Edition</div>
-        </div>
-    </div>
-</body>
-</html>
