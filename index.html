@@ -751,10 +751,13 @@ function iniciarApp(){
   actualizarBtnClave();
   actualizarHeaderLogo();
   if(cfg.mesero && document.getElementById('metaMesero')) document.getElementById('metaMesero').value = cfg.mesero;
-  document.getElementById('histBadge').textContent = comandas.length;
   const s = document.getElementById('splash');
   if(s){ s.classList.add('hiding'); setTimeout(()=>s.style.display='none',600); }
-  setTimeout(renderDashboard, 2100);
+  // Cargar comandas desde Supabase
+  cargarComandasSupabase().then(()=>{
+    document.getElementById('histBadge').textContent = comandas.length;
+    setTimeout(renderDashboard, 300);
+  });
 }
 
 // ══ TEMA ══
@@ -797,11 +800,14 @@ function switchTab(name, btn){
 }
 
 function accederDashboard(btn){
-  if(!cfg.adminHash){ switchTab('dashboard', btn); return; }
-  const clave = prompt('🔐 Clave de administrador para ver Ventas:');
+  if(!cfg.adminHash){
+    toast('⚠️ Configura primero una clave de administrador en ⚙️');
+    return;
+  }
+  const clave = prompt('🔐 Clave de administrador:');
   if(clave === null) return;
   if(hashSimple(clave) === cfg.adminHash) switchTab('dashboard', btn);
-  else toast('❌ Clave incorrecta');
+  else { toast('❌ Clave incorrecta'); if(navigator.vibrate) navigator.vibrate(200); }
 }
 
 // ══ LOGO ══
@@ -844,7 +850,11 @@ function renderQRPreview(){
 
 // ══ CONFIG ══
 function openConfig(){
-  if(cfg.adminHash){
+  if(!cfg.adminHash){
+    // Primera vez — dejar entrar para que pueda crear la clave
+    const ok = confirm('⚠️ No tienes clave de administrador configurada.\n\nEntra para crear tu clave ahora y proteger la configuración.');
+    if(!ok) return;
+  } else {
     const clave = prompt('🔐 Clave de administrador:');
     if(clave === null) return;
     if(hashSimple(clave) !== cfg.adminHash){ toast('❌ Clave incorrecta'); return; }
@@ -1098,7 +1108,8 @@ function guardarComanda(){
   registrarItemsFrecuentes(ordenActual.items||[]);
   const cmd = {...ordenActual, estadoPago:'pendiente', pago:{}};
   comandas.unshift(cmd);
-  localStorage.setItem('siryx_comandas', JSON.stringify(comandas));
+  guardarLocal();
+  guardarComandaSupabase(cmd);
   counter++; localStorage.setItem('siryx_counter', String(counter));
   document.getElementById('histBadge').textContent = comandas.length;
   document.getElementById('btnGuardar').disabled = true;
@@ -1182,7 +1193,14 @@ function confirmarPago(){
     document.getElementById('histBadge').textContent = comandas.length;
     document.getElementById('btnGuardar').disabled = true;
   }
-  localStorage.setItem('siryx_comandas', JSON.stringify(comandas));
+  guardarLocal();
+  // Sincronizar comanda actualizada en Supabase
+  const cmdPagada = window._pagoHistIdx !== undefined ? null : comandas[0];
+  if(window._pagoHistIdx !== undefined){
+    actualizarComandaSupabase(comandas[window._pagoHistIdx !== undefined ? 0 : 0]);
+  }
+  // Actualizar todas las comandas modificadas
+  comandas.forEach(cmd => { if(cmd.pagadoEl && new Date(cmd.pagadoEl) > new Date(Date.now()-5000)) actualizarComandaSupabase(cmd); });
   cerrarModalPago(); renderHistorial(); renderDashboard();
   toast('✅ Pago registrado correctamente');
 }
@@ -1299,7 +1317,8 @@ function guardarEdicion(){
   const notas = document.getElementById('editarNotas').value.trim();
   if(notas) comandas[idx].notas=notas; else delete comandas[idx].notas;
   comandas[idx].editadoEl = new Date().toISOString();
-  localStorage.setItem('siryx_comandas', JSON.stringify(comandas));
+  guardarLocal();
+  actualizarComandaSupabase(comandas[idx]);
   cerrarModalEditar();
   renderHistorial(); renderDashboard();
   toast('✅ Comanda actualizada');
@@ -1354,7 +1373,10 @@ function confirmarFusion(){
     estadoPago:'pendiente', pago:{}, fusionadaDe:idxs};
   idxs.forEach(i=>{ comandas[i].estadoPago='fusionada'; comandas[i].fusionadaEn=fusionada.id; });
   comandas.unshift(fusionada);
-  localStorage.setItem('siryx_comandas', JSON.stringify(comandas));
+  guardarLocal();
+  guardarComandaSupabase(fusionada);
+  // Actualizar las originales como fusionadas
+  idxs.forEach(i=>actualizarComandaSupabase(comandas[i+1]||comandas[i]));
   cerrarModalFusionar(); renderHistorial();
   ordenActual=fusionada; window._pagoHistIdx=0;
   abrirModalPago(); toast('🔗 Comandas fusionadas — registra el pago');
@@ -1373,7 +1395,8 @@ function cancelarComanda(idx){
   comandas[idx].estadoPago = 'cancelada';
   comandas[idx].canceladoEl = new Date().toISOString();
   comandas[idx].motivoCancelacion = motivo||'Sin motivo';
-  localStorage.setItem('siryx_comandas', JSON.stringify(comandas));
+  guardarLocal();
+  actualizarComandaSupabase(comandas[idx]);
   renderHistorial(); renderDashboard();
   toast('❌ Comanda #'+comandas[idx].id+' cancelada');
   notificarDuenoEdicion(comandas[idx].id,'CANCELACIÓN','Motivo: '+(motivo||'Sin motivo'));
@@ -1567,7 +1590,13 @@ function quitarClave(){const val=document.getElementById('claveQuitarInput').val
 function limpiarErrPin(){ document.getElementById('errPin').textContent=''; }
 function closeVerificar(){ document.getElementById('modalVerificar').classList.remove('open'); pendingDeleteIdx=null; }
 function confirmarEliminar(){const val=document.getElementById('pinVerificar').value;if(hashSimple(val)!==cfg.adminHash){document.getElementById('errPin').textContent='Clave incorrecta.';document.getElementById('pinVerificar').value='';return;}document.getElementById('modalVerificar').classList.remove('open');_doEliminar(pendingDeleteIdx);pendingDeleteIdx=null;}
-function _doEliminar(i){comandas.splice(i,1);localStorage.setItem('siryx_comandas',JSON.stringify(comandas));renderHistorial();renderDashboard();toast('🗑 Comanda eliminada');}
+function _doEliminar(i){
+  const cmdId = comandas[i]?.id;
+  comandas.splice(i,1);
+  guardarLocal();
+  if(cmdId) eliminarComandaSupabase(cmdId);
+  renderHistorial();renderDashboard();toast('🗑 Comanda eliminada');
+}
 const preguntas={mascota:'¿Nombre de tu mascota?',madre:'¿Nombre de tu madre?',ciudad:'¿Ciudad donde naciste?',colegio:'¿Tu primer colegio?',plato:'¿Tu plato favorito?'};
 function abrirRecuperacion(){document.getElementById('modalVerificar').classList.remove('open');document.getElementById('recRespuesta').value='';document.getElementById('recCodigo').value='';document.getElementById('recPreguntaErr').textContent='';document.getElementById('recCodigoErr').textContent='';document.getElementById('recPreguntaTexto').textContent=preguntas[cfg.adminPregunta]||'Pregunta no configurada';document.getElementById('modalRecuperar').classList.add('open');}
 function closeRecuperar(){ document.getElementById('modalRecuperar').classList.remove('open'); }
@@ -1650,6 +1679,79 @@ function renderDashboard(){
   const maxProd=top5.length?top5[0][1]:1;
   document.getElementById('topProductos').innerHTML=top5.length?top5.map(([name,cnt],i)=>`<div class="top-item"><div class="top-rank">${i+1}</div><div class="top-name">${name}</div><div class="top-bar-wrap"><div class="top-bar-fill" style="width:${(cnt/maxProd)*100}%"></div></div><div class="top-count">${cnt}</div></div>`).join(''):'<div style="color:var(--muted);font-size:12px;padding:10px 0">Sin datos aún</div>';
   document.getElementById('recentTable').innerHTML=comandas.slice(0,8).map(c=>`<tr><td class="td-num">#${c.id}</td><td>${c.mesa||'—'}</td><td style="font-family:var(--mono);font-size:10px;color:var(--muted)">${c.hora}</td><td class="td-total">${c.tiene_precios?fmtNum(c.subtotal):c.items.length+' ítem(s)'}</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:16px">Sin registros</td></tr>';
+}
+
+
+// ══════════════════════════════════════════
+//  SUPABASE — COMANDAS SINCRONIZADAS
+// ══════════════════════════════════════════
+
+async function cargarComandasSupabase(){
+  if(!cfg.clienteId) return;
+  try{
+    const { data, error } = await db
+      .from('comandas')
+      .select('id, datos')
+      .eq('cliente_id', cfg.clienteId)
+      .order('created_at', {ascending:false});
+    if(error) throw error;
+    if(data && data.length){
+      comandas = data.map(r => r.datos);
+      localStorage.setItem('siryx_comandas', JSON.stringify(comandas));
+      document.getElementById('histBadge').textContent = comandas.length;
+    }
+  } catch(e){
+    console.warn('Supabase no disponible, usando datos locales:', e.message);
+  }
+}
+
+async function guardarComandaSupabase(comanda){
+  if(!cfg.clienteId) return;
+  try{
+    const { error } = await db
+      .from('comandas')
+      .upsert({
+        id: comanda.id,
+        cliente_id: cfg.clienteId,
+        datos: comanda,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'id,cliente_id' });
+    if(error) throw error;
+  } catch(e){
+    console.warn('Error guardando en Supabase:', e.message);
+  }
+}
+
+async function actualizarComandaSupabase(comanda){
+  if(!cfg.clienteId) return;
+  try{
+    const { error } = await db
+      .from('comandas')
+      .update({ datos: comanda, updated_at: new Date().toISOString() })
+      .eq('id', comanda.id)
+      .eq('cliente_id', cfg.clienteId);
+    if(error) throw error;
+  } catch(e){
+    console.warn('Error actualizando en Supabase:', e.message);
+  }
+}
+
+async function eliminarComandaSupabase(comandaId){
+  if(!cfg.clienteId) return;
+  try{
+    const { error } = await db
+      .from('comandas')
+      .delete()
+      .eq('id', comandaId)
+      .eq('cliente_id', cfg.clienteId);
+    if(error) throw error;
+  } catch(e){
+    console.warn('Error eliminando en Supabase:', e.message);
+  }
+}
+
+function guardarLocal(){
+  localStorage.setItem('siryx_comandas', JSON.stringify(comandas));
 }
 
 // ══ INICIO ══
