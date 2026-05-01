@@ -319,6 +319,7 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
     <div class="clock" id="clockDisplay">--:--</div>
     <button class="icon-btn" id="themeToggle" onclick="toggleTheme()" title="Modo claro/oscuro">🌙</button>
     <button class="icon-btn" onclick="openConfig()" title="Configuración">⚙</button>
+    <button class="icon-btn" onclick="cerrarSesion()" title="Cerrar sesión" style="color:var(--red)">🚪</button>
   </div>
 </header>
 
@@ -758,6 +759,16 @@ function iniciarApp(){
     document.getElementById('histBadge').textContent = comandas.length;
     setTimeout(renderDashboard, 300);
   });
+}
+
+function cerrarSesion(){
+  if(!confirm('¿Cerrar sesión?\n\nTendrás que ingresar tu ID nuevamente para entrar.')) return;
+  // Limpiar sesión pero mantener configuración
+  delete cfg.clienteId;
+  delete cfg.licencia;
+  localStorage.setItem('siryx_cfg', JSON.stringify(cfg));
+  // Recargar página para mostrar pantalla de activación
+  location.reload();
 }
 
 // ══ TEMA ══
