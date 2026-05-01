@@ -277,6 +277,51 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
   .dash-grid{grid-template-columns:1fr 1fr}
   .logo-sub{display:none}
 }
+
+/* ══ TOOLTIPS ══ */
+[title]{position:relative}
+[title]:hover::after{
+  content:attr(title);
+  position:absolute;
+  bottom:calc(100% + 8px);
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(0,0,0,.9);
+  color:#fff;
+  font-size:11px;
+  font-weight:600;
+  padding:5px 10px;
+  border-radius:6px;
+  white-space:nowrap;
+  z-index:9999;
+  pointer-events:none;
+  font-family:var(--sans);
+  letter-spacing:.3px;
+  border:1px solid rgba(255,255,255,.1);
+}
+[title]:hover::before{
+  content:'';
+  position:absolute;
+  bottom:calc(100% + 2px);
+  left:50%;
+  transform:translateX(-50%);
+  border:5px solid transparent;
+  border-top-color:rgba(0,0,0,.9);
+  z-index:9999;
+  pointer-events:none;
+}
+
+/* ══ PANEL PRODUCTOS FRECUENTES ══ */
+.productos-panel{background:var(--s1);border-top:1px solid var(--border);padding:16px 20px;flex-shrink:0}
+.productos-panel-title{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.productos-chips{display:flex;flex-wrap:wrap;gap:6px;max-height:120px;overflow-y:auto}
+.prod-chip{display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--border);border-radius:20px;padding:5px 10px;cursor:pointer;transition:all .15s;font-size:12px;font-weight:600;max-width:180px}
+.prod-chip:hover{border-color:var(--accent);background:rgba(79,70,229,.08);color:var(--accent)}
+.prod-chip .chip-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prod-chip .chip-price{font-family:var(--mono);font-size:10px;color:var(--muted);flex-shrink:0}
+.prod-chip .chip-count{font-size:9px;background:var(--accent);color:#fff;border-radius:10px;padding:1px 5px;flex-shrink:0}
+.prod-chip.manual{border-color:var(--orange);background:rgba(245,158,11,.06)}
+.prod-chip.manual:hover{border-color:var(--orange);background:rgba(245,158,11,.12)}
 </style>
 </head>
 <body>
@@ -327,6 +372,7 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
   <button class="tab-btn active" onclick="switchTab('comanda',this)">🧾 Comanda</button>
   <button class="tab-btn" onclick="switchTab('historial',this)">📋 Historial <span class="tab-badge" id="histBadge">0</span></button>
   <button class="tab-btn" id="tabVentas" onclick="accederDashboard(this)">📊 Ventas</button>
+  <button class="tab-btn" onclick="accederArchivo(this)">🗂 Archivo</button>
 </div>
 
 <main>
@@ -355,13 +401,24 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
       </div>
       <div class="meta-field"><label>Notas adicionales</label><textarea class="notas-field" id="metaNotas" placeholder="Alergias, instrucciones..."></textarea></div>
       <div class="btn-row">
-        <button class="btn btn-primary" id="btnProcesar" onclick="procesarPedido()">
+        <button class="btn btn-primary" id="btnProcesar" onclick="procesarPedido()" title="Interpretar pedido con IA y generar comanda">
           <span class="spinner" id="spinnerP"></span>
           <span class="btn-txt">✨ Generar Comanda</span>
         </button>
-        <button class="btn btn-secondary" onclick="limpiarTodo()">🗑 Limpiar</button>
+        <button class="btn btn-secondary" onclick="limpiarTodo()" title="Limpiar todos los campos">🗑 Limpiar</button>
       </div>
       <div class="status-bar" id="statusBar"></div>
+
+      <!-- PANEL PRODUCTOS FRECUENTES -->
+      <div class="productos-panel" id="productosPanel">
+        <div class="productos-panel-title">
+          <span>🔥 Productos frecuentes — toca para agregar a la comanda</span>
+          <button onclick="abrirGestionProductos()" style="background:none;border:1px solid var(--border);color:var(--muted);font-size:10px;padding:3px 8px;border-radius:6px;cursor:pointer;transition:all .15s" title="Gestionar productos del menú">⚙ Gestionar</button>
+        </div>
+        <div class="productos-chips" id="productosChips">
+          <div style="color:var(--muted);font-size:11px;padding:4px">Generando pedidos para aprender los platos más pedidos...</div>
+        </div>
+      </div>
     </div>
     <div class="preview-panel">
       <div class="preview-header">
@@ -375,10 +432,10 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
       </div>
       <div class="print-actions">
         <div class="print-row">
-          <button class="btn btn-primary" id="btnImprimir" onclick="imprimirWindows()" disabled style="flex:1;font-size:11px">🖨 Imprimir (USB/BT Windows)</button>
+          <button class="btn btn-primary" id="btnImprimir" onclick="imprimirWindows()" disabled style="flex:1;font-size:11px" title="Imprimir ticket en impresora térmica conectada por USB o Bluetooth en Windows">🖨 Imprimir (USB/BT Windows)</button>
         </div>
         <div class="print-row">
-          <button class="btn btn-orange" id="btnCopiarBT" onclick="copiarParaBT()" disabled style="flex:1;font-size:11px">📱 Copiar para app BT Android</button>
+          <button class="btn btn-orange" id="btnCopiarBT" onclick="copiarParaBT()" disabled style="flex:1;font-size:11px" title="Copiar texto del ticket para pegar en PrintHand o RawBT en Android">📱 Copiar para app BT Android</button>
           <button class="btn btn-secondary" onclick="toggleBTHelp()" style="font-size:11px;padding:9px 10px">?</button>
         </div>
         <div class="tooltip-box" id="btHelp">
@@ -389,7 +446,7 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
           4. Pega en PrintHand → Imprimir
         </div>
         <div class="print-row">
-          <button class="btn btn-secondary" id="btnGuardar" onclick="guardarComanda()" disabled style="flex:1;font-size:11px">💾 Enviar a cocina</button>
+          <button class="btn btn-secondary" id="btnGuardar" onclick="guardarComanda()" disabled style="flex:1;font-size:11px" title="Guardar comanda y enviar a cocina sin registrar pago aún">💾 Enviar a cocina</button>
         </div>
       </div>
     </div>
@@ -402,8 +459,8 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
 
 <div class="tab-content" id="tab-dashboard">
   <div style="padding:24px 32px 0;display:flex;gap:12px">
-    <button onclick="abrirCierreCaja()" class="btn btn-primary" style="flex:1">🧾 Generar Cierre de Caja</button>
-    <button onclick="iniciarTurno()" class="btn btn-secondary">⏰ Iniciar Turno</button>
+    <button onclick="abrirCierreCaja()" class="btn btn-primary" style="flex:1" title="Ver resumen de ventas del día por método de pago y enviar por WhatsApp">🧾 Generar Cierre de Caja</button>
+    <button onclick="iniciarTurno()" class="btn btn-secondary" title="Registrar la hora de inicio del turno para el reporte de cierre">⏰ Iniciar Turno</button>
   </div>
   <div id="dashResumenPagos" style="background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;margin:24px 32px 0"></div>
   <div class="dash-layout">
@@ -421,6 +478,30 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
       <div class="chart-container"><div class="chart-title">ÚLTIMAS ÓRDENES</div><div style="overflow-y:auto"><table class="orders-table"><thead><tr><th>#</th><th>Mesa</th><th>Hora</th><th>Total</th></tr></thead><tbody id="recentTable"></tbody></table></div></div>
     </div>
   </div>
+
+<!-- TAB ARCHIVO HISTÓRICO -->
+<div class="tab-content" id="tab-archivo">
+  <div style="padding:24px 32px 0;display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+    <div style="font-size:13px;font-weight:700;color:var(--muted)">Filtrar por:</div>
+    <select id="archivoFiltroTipo" class="meta-input" style="width:140px;font-size:12px" onchange="renderArchivo()">
+      <option value="dia">Por día</option>
+      <option value="mes">Por mes</option>
+      <option value="anio">Por año</option>
+    </select>
+    <input type="date" id="archivoFiltroDia" class="meta-input" style="width:160px;font-size:12px" onchange="renderArchivo()">
+    <select id="archivoFiltroMes" class="meta-input" style="width:160px;font-size:12px;display:none" onchange="renderArchivo()">
+      <option value="1">Enero</option><option value="2">Febrero</option><option value="3">Marzo</option>
+      <option value="4">Abril</option><option value="5">Mayo</option><option value="6">Junio</option>
+      <option value="7">Julio</option><option value="8">Agosto</option><option value="9">Septiembre</option>
+      <option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+    </select>
+    <select id="archivoFiltroAnio" class="meta-input" style="width:120px;font-size:12px" onchange="renderArchivo()">
+    </select>
+    <div style="margin-left:auto;font-size:12px;color:var(--muted)" id="archivoResumen"></div>
+  </div>
+  <div id="archivoList" style="flex:1;overflow-y:auto;padding:24px 32px;display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px"></div>
+</div>
+
 </div>
 </main>
 
@@ -604,6 +685,31 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
   </div>
 </div>
 
+<!-- MODAL GESTIONAR PRODUCTOS -->
+<div class="modal-overlay" id="modalProductos">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-title">🍽 Gestionar Productos del Menú
+      <button onclick="document.getElementById('modalProductos').classList.remove('open')" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;float:right">✕</button>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:4px">Agrega productos manualmente. La IA agrega automáticamente los más pedidos.</div>
+
+    <!-- AGREGAR PRODUCTO MANUAL -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <input class="meta-input" id="prodNombre" placeholder="Nombre del producto" style="flex:2;font-size:12px" onkeydown="if(event.key==='Enter')document.getElementById('prodPrecio').focus()">
+      <input class="meta-input" id="prodPrecio" type="number" placeholder="Precio" style="flex:1;font-size:12px;min-width:90px" onkeydown="if(event.key==='Enter')agregarProductoManual()">
+      <button onclick="agregarProductoManual()" class="btn btn-primary" style="font-size:12px;padding:8px 14px">+ Agregar</button>
+    </div>
+
+    <!-- LISTA DE PRODUCTOS -->
+    <div style="max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:6px" id="listaProductosModal"></div>
+
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button onclick="limpiarFrecuentes()" class="btn btn-secondary" style="font-size:11px;flex:1">🗑 Limpiar aprendidos por IA</button>
+      <button onclick="document.getElementById('modalProductos').classList.remove('open')" class="btn btn-primary" style="font-size:11px;flex:1">✅ Cerrar</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 <div id="print-frame"></div>
 <script>
@@ -759,6 +865,8 @@ function iniciarApp(){
     document.getElementById('histBadge').textContent = comandas.length;
     setTimeout(renderDashboard, 300);
   });
+  // Renderizar panel de productos
+  setTimeout(renderProductosPanel, 500);
 }
 
 function cerrarSesion(){
@@ -808,6 +916,7 @@ function switchTab(name, btn){
   btn.classList.add('active');
   if(name === 'historial') renderHistorial();
   if(name === 'dashboard') renderDashboard();
+  if(name === 'archivo'){ inicializarFiltrosArchivo(); renderArchivo(); }
 }
 
 function accederDashboard(btn){
@@ -962,7 +1071,27 @@ Responde ÚNICAMENTE con JSON válido, sin texto adicional, sin backticks:
   "tiene_precios": true,
   "subtotal": 36000,
   "resumen": "descripción breve"
-}`;
+}
+
+REGLAS IMPORTANTES PARA PRECIOS:
+- unit_price SIEMPRE debe ser número entero en pesos colombianos (COP)
+- Formatos de precio que debes reconocer: 18000, 18.000, $18000, $18.000, 18k, 18 mil, 18,000
+- Si el texto dice "a 18000" o "por 18000" o "c/u 18000" → unit_price: 18000
+- Si el texto dice "2 hamburguesas 36000" → qty:2, unit_price:18000 (divide entre cantidad)
+- Si hay precio total de varios ítems iguales, divide para obtener precio unitario
+- tiene_precios: true si hay AL MENOS UN precio en el texto
+- subtotal: suma exacta de qty * unit_price de todos los ítems
+- Si no hay precio para un ítem → unit_price: 0
+- NUNCA omitas el unit_price aunque sea 0
+
+REGLAS PARA ÍTEMS:
+- Agrupa ítems idénticos sumando cantidades
+- note: modificaciones del ítem o "" si no hay
+- qty: siempre número entero mayor a 0
+
+REGLAS PARA MESA/MESERO/TIPO:
+- mesa: "mesa 3","la 5","M4" → "Mesa 3". Nombre de cliente → úsalo. Sin info → ""
+- tipo: MESA/DOMICILIO/PARA LLEVAR/BARRA según contexto`;
   try{
     const groqKey = cfg.groqKey;
     if(!groqKey){ showStatus('Configura tu API Key de Groq en ⚙','err'); btn.disabled=false; btn.classList.remove('loading'); return; }
@@ -1126,6 +1255,7 @@ function guardarComanda(){
   document.getElementById('btnGuardar').disabled = true;
   toast('🍳 Comanda enviada a cocina');
   renderDashboard();
+  renderProductosPanel();
 }
 
 // ══ PAGO ══
@@ -1473,7 +1603,12 @@ function abrirCierreCaja(){
   overlay.appendChild(box);
   document.body.appendChild(overlay);
   document.getElementById('btnCierreCerrar').addEventListener('click',()=>overlay.remove());
-  document.getElementById('btnCierreClose').addEventListener('click',()=>overlay.remove());
+  document.getElementById('btnCierreClose').addEventListener('click',()=>{
+    // Archivar comandas del día al cerrar
+    const n = archivarComandasDelDia(hoyStr);
+    if(n>0) toast('🗂 '+n+' comandas archivadas');
+    overlay.remove();
+  });
   document.getElementById('btnCierreWA').addEventListener('click',()=>{
     const tel=(cfg.telDueno||'').replace(/\D/g,'');
     window.open('https://wa.me/'+(tel?'57'+tel:'')+'?text='+encodeURIComponent(waText),'_blank');
@@ -1526,15 +1661,15 @@ function renderHistorial(){
         ${estadoTag}${traza}
       </div>
       <div class="hist-actions">
-        <button class="btn btn-secondary btn-sm" onclick="reimprimirHist(${i})">🖨</button>
-        <button class="btn btn-secondary btn-sm" onclick="copiarHist(${i})">📱</button>
-        <button class="btn btn-secondary btn-sm" onclick="editarComanda(${i})">✏️</button>
-        <button class="btn btn-secondary btn-sm" onclick="abrirFusionar(${i})">🔗</button>
-        <button class="btn btn-secondary btn-sm" onclick="cancelarComanda(${i})" style="color:var(--orange)">❌</button>
+        <button class="btn btn-secondary btn-sm" onclick="reimprimirHist(${i})" title="Reimprimir este ticket">🖨</button>
+        <button class="btn btn-secondary btn-sm" onclick="copiarHist(${i})" title="Copiar texto para imprimir por Bluetooth">📱</button>
+        <button class="btn btn-secondary btn-sm" onclick="editarComanda(${i})" title="Editar ítems o notas de esta comanda (requiere clave admin)">✏️</button>
+        <button class="btn btn-secondary btn-sm" onclick="abrirFusionar(${i})" title="Fusionar con otra comanda para cobrar en una sola cuenta">🔗</button>
+        <button class="btn btn-secondary btn-sm" onclick="cancelarComanda(${i})" style="color:var(--orange)" title="Cancelar esta comanda con motivo (requiere clave admin)">❌</button>
         ${c.estadoPago!=='cancelada'&&c.estadoPago!=='fusionada'&&c.estadoPago!=='pagado'&&c.estadoPago!=='cortesia'
-          ? `<button class="btn btn-primary btn-sm" onclick="registrarPagoHistorial(${i})">💳 Pagar</button>` : ''}
+          ? `<button class="btn btn-primary btn-sm" onclick="registrarPagoHistorial(${i})" title="Registrar el pago de esta comanda">💳 Pagar</button>` : ''}
         ${c.estadoPago==='fusionada' ? '<span style="font-size:10px;color:#9333ea;padding:4px 8px;border:1px solid #9333ea;border-radius:4px">📎 En fusión</span>' : ''}
-        <button class="btn btn-secondary btn-sm" onclick="eliminarComanda(${i})" style="color:var(--red)">🗑</button>
+        <button class="btn btn-secondary btn-sm" onclick="eliminarComanda(${i})" style="color:var(--red)" title="Eliminar permanentemente esta comanda (requiere clave admin)">🗑</button>
       </div>
     </div>`;
   }).join('');
@@ -1763,6 +1898,273 @@ async function eliminarComandaSupabase(comandaId){
 
 function guardarLocal(){
   localStorage.setItem('siryx_comandas', JSON.stringify(comandas));
+}
+
+
+// ══════════════════════════════════════════
+//  ARCHIVO HISTÓRICO
+// ══════════════════════════════════════════
+function getArchivo(){ return JSON.parse(localStorage.getItem('siryx_archivo')||'[]'); }
+function saveArchivo(a){ localStorage.setItem('siryx_archivo',JSON.stringify(a)); }
+
+function archivarComandasDelDia(hoyStr){
+  const archivo = getArchivo();
+  const paraArchivar = comandas.filter(c=>c.fecha===hoyStr);
+  if(!paraArchivar.length) return 0;
+  // Agregar al archivo con timestamp de cierre
+  paraArchivar.forEach(cmd=>{
+    // Evitar duplicados
+    if(!archivo.find(a=>a.id===cmd.id&&a.fecha===cmd.fecha)){
+      archivo.push({...cmd, archivadoEl:new Date().toISOString()});
+    }
+  });
+  saveArchivo(archivo);
+  // También sincronizar en Supabase si hay conexión
+  if(cfg.clienteId){
+    db.from('archivo_historico')
+      .upsert(paraArchivar.map(cmd=>({
+        id:cmd.id, cliente_id:cfg.clienteId,
+        datos:cmd, fecha:cmd.fecha,
+        archivado_el:new Date().toISOString()
+      })),{onConflict:'id,cliente_id'})
+      .then(({error})=>{ if(error) console.warn('Archivo Supabase:',error.message); });
+  }
+  return paraArchivar.length;
+}
+
+function accederArchivo(btn){
+  if(!cfg.adminHash){
+    toast('⚠️ Configura una clave de administrador en ⚙️ para acceder al archivo');
+    return;
+  }
+  const clave = prompt('🔐 Clave de administrador para ver el Archivo Histórico:');
+  if(clave===null) return;
+  if(hashSimple(clave)!==cfg.adminHash){ toast('❌ Clave incorrecta'); return; }
+  switchTab('archivo', btn);
+  inicializarFiltrosArchivo();
+  renderArchivo();
+}
+
+function inicializarFiltrosArchivo(){
+  const archivo = getArchivo();
+  const anios = [...new Set(archivo.map(c=>{
+    if(!c.fecha) return null;
+    // fecha formato dd/mm/yyyy
+    const partes = c.fecha.split('/');
+    return partes.length===3 ? partes[2] : null;
+  }).filter(Boolean))].sort((a,b)=>b-a);
+  const sel = document.getElementById('archivoFiltroAnio');
+  sel.innerHTML = anios.length
+    ? anios.map(a=>`<option value="${a}">${a}</option>`).join('')
+    : `<option value="${new Date().getFullYear()}">${new Date().getFullYear()}</option>`;
+  // Poner fecha de hoy por defecto
+  const hoy = new Date().toISOString().split('T')[0];
+  document.getElementById('archivoFiltroDia').value = hoy;
+  // Poner mes actual
+  document.getElementById('archivoFiltroMes').value = new Date().getMonth()+1;
+}
+
+function renderArchivo(){
+  const tipo = document.getElementById('archivoFiltroTipo').value;
+  const anio = document.getElementById('archivoFiltroAnio').value;
+  const diaEl = document.getElementById('archivoFiltroDia');
+  const mesEl = document.getElementById('archivoFiltroMes');
+
+  // Mostrar/ocultar filtros según tipo
+  diaEl.style.display = tipo==='dia' ? 'block' : 'none';
+  mesEl.style.display = tipo==='mes' ? 'block' : 'none';
+
+  const archivo = getArchivo();
+  let filtradas = [];
+
+  if(tipo==='dia'){
+    const diaVal = diaEl.value; // yyyy-mm-dd
+    if(!diaVal) return;
+    const partes = diaVal.split('-');
+    const diaFmt = partes[2]+'/'+partes[1]+'/'+partes[0];
+    filtradas = archivo.filter(c=>c.fecha===diaFmt);
+  } else if(tipo==='mes'){
+    const mes = String(mesEl.value).padStart(2,'0');
+    filtradas = archivo.filter(c=>c.fecha&&c.fecha.slice(3,5)===mes&&c.fecha.slice(6)===anio);
+  } else {
+    filtradas = archivo.filter(c=>c.fecha&&c.fecha.slice(6)===anio);
+  }
+
+  const list = document.getElementById('archivoList');
+  const totalVentas = filtradas.reduce((a,c)=>a+(c.subtotal||0),0);
+  const pagadas = filtradas.filter(c=>c.estadoPago==='pagado'||c.estadoPago==='cortesia').length;
+  document.getElementById('archivoResumen').innerHTML =
+    `<b style="color:var(--accent)">${filtradas.length}</b> comandas · `+
+    `<b style="color:var(--green)">${fmtNum(totalVentas)}</b> total · `+
+    `<b>${pagadas}</b> pagadas`;
+
+  if(!filtradas.length){
+    list.innerHTML='<div style="text-align:center;padding:60px;color:var(--muted);grid-column:1/-1"><div style="font-size:48px;opacity:.2;margin-bottom:16px">🗂</div><div style="font-weight:600">Sin comandas archivadas en este período</div></div>';
+    return;
+  }
+
+  // Ordenar por fecha y hora más reciente
+  filtradas.sort((a,b)=>new Date(b.timestamp||0)-new Date(a.timestamp||0));
+
+  list.innerHTML = filtradas.map(c=>{
+    const estadoColor = c.estadoPago==='pagado'?'var(--green)':c.estadoPago==='cancelada'?'var(--red)':'var(--orange)';
+    const estadoLabel = c.estadoPago==='pagado'?'✅ Pagada':c.estadoPago==='cortesia'?'🎁 Cortesía':c.estadoPago==='cancelada'?'❌ Cancelada':'⏳ Pendiente';
+    const metodosPago = c.pago ? Object.entries(c.pago)
+      .filter(([k,v])=>k!=='descuento'&&k!=='cortesia'&&typeof v==='number')
+      .map(([k,v])=>`${k}: ${fmtNum(v)}`).join(' · ') : '';
+    return `<div class="hist-card" style="opacity:0.95">
+      <div class="hist-header">
+        <div class="hist-info">
+          <div class="hist-num">#${c.id}</div>
+          <div class="hist-mesa">${c.mesa||'Sin Mesa'}</div>
+          <div class="hist-meta">${c.fecha} · ${c.hora} · ${c.tipo||'S/T'}</div>
+        </div>
+        <div>
+          <div class="hist-total">${c.tiene_precios?fmtNum(c.subtotal):c.items.length+' ítems'}</div>
+          <div style="font-size:10px;color:${estadoColor};font-weight:700;text-align:right;margin-top:4px">${estadoLabel}</div>
+        </div>
+      </div>
+      <div class="hist-items" style="font-size:13px">
+        ${c.items.slice(0,4).map(it=>`<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.03)">
+          <span><b style="color:var(--accent)">${it.qty||1}x</b> ${it.name||it.nombre||'?'}</span>
+          ${c.tiene_precios&&(it.unit_price||it.precio)?`<span style="font-family:var(--mono);color:var(--muted);font-size:11px">${fmtNum((it.qty||1)*(it.unit_price||it.precio||0))}</span>`:''}
+        </div>`).join('')}
+        ${c.items.length>4?`<div style="font-size:10px;color:var(--muted);margin-top:4px">+${c.items.length-4} ítems más</div>`:''}
+      </div>
+      ${metodosPago?`<div style="font-size:11px;color:var(--muted);font-family:var(--mono);padding-top:8px;border-top:1px solid var(--border)">${metodosPago}</div>`:''}
+      ${c.notas?`<div style="font-size:11px;color:var(--muted)">📝 ${c.notas}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+
+// ══════════════════════════════════════════
+//  PRODUCTOS FRECUENTES E IA
+// ══════════════════════════════════════════
+function getProductosManuales(){ return JSON.parse(localStorage.getItem('siryx_productos_manual')||'[]'); }
+function saveProductosManuales(p){ localStorage.setItem('siryx_productos_manual',JSON.stringify(p)); }
+function getFrecuentes(){ return JSON.parse(localStorage.getItem('siryx_frecuentes')||'{}'); }
+
+function renderProductosPanel(){
+  const chips = document.getElementById('productosChips');
+  if(!chips) return;
+
+  const manuales = getProductosManuales();
+  const frecuentes = getFrecuentes();
+  const topIA = Object.entries(frecuentes).sort((a,b)=>b[1]-a[1]).slice(0,12);
+
+  let html = '';
+
+  // Primero los manuales
+  manuales.forEach(p=>{
+    html += `<div class="prod-chip manual" onclick="agregarProductoComanda('${p.nombre.replace(/'/g,"\'")}',${p.precio})" title="${p.nombre}${p.precio?' — '+fmtNum(p.precio):''}">
+      <span class="chip-name">${p.nombre}</span>
+      ${p.precio?`<span class="chip-price">${fmtNum(p.precio)}</span>`:''}
+    </div>`;
+  });
+
+  // Luego los aprendidos por IA (que no estén ya en manuales)
+  const nombresManual = manuales.map(p=>p.nombre.toLowerCase());
+  topIA.forEach(([nombre,count])=>{
+    if(nombresManual.includes(nombre.toLowerCase())) return;
+    html += `<div class="prod-chip" onclick="agregarProductoComanda('${nombre.replace(/'/g,"\'")}',0)" title="${nombre} — pedido ${count} vez(ces)">
+      <span class="chip-name">${nombre}</span>
+      <span class="chip-count">${count}</span>
+    </div>`;
+  });
+
+  if(!html){
+    html = '<div style="color:var(--muted);font-size:11px;padding:4px">Genera comandas para que la IA aprenda los platos más pedidos, o agrega productos manualmente con ⚙ Gestionar.</div>';
+  }
+
+  chips.innerHTML = html;
+}
+
+function agregarProductoComanda(nombre, precio){
+  // Agregar al área de texto del pedido
+  const zona = document.getElementById('pasteZone');
+  const actual = zona.value.trim();
+  const linea = precio>0 ? '• 1 '+nombre+' '+precio : '• 1 '+nombre;
+  zona.value = actual ? actual + '\n' + linea : linea;
+  zona.focus();
+  // Efecto visual
+  zona.style.borderColor = 'var(--accent)';
+  setTimeout(()=>zona.style.borderColor='', 600);
+  toast('✅ '+nombre+' agregado al pedido');
+}
+
+function abrirGestionProductos(){
+  renderListaProductosModal();
+  document.getElementById('modalProductos').classList.add('open');
+  document.getElementById('prodNombre').focus();
+}
+
+function renderListaProductosModal(){
+  const manuales = getProductosManuales();
+  const frecuentes = getFrecuentes();
+  const topIA = Object.entries(frecuentes).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const lista = document.getElementById('listaProductosModal');
+
+  let html = '';
+
+  if(manuales.length){
+    html += '<div style="font-size:10px;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin:8px 0 4px">📝 Agregados manualmente</div>';
+    manuales.forEach((p,i)=>{
+      html += `<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--s2);border:1px solid var(--border);border-radius:8px">
+        <span style="flex:1;font-size:13px;font-weight:600">${p.nombre}</span>
+        ${p.precio?`<span style="font-family:var(--mono);font-size:12px;color:var(--muted)">${fmtNum(p.precio)}</span>`:'<span style="font-size:11px;color:var(--muted)">sin precio</span>'}
+        <button onclick="eliminarProductoManual(${i})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;padding:0 4px" title="Eliminar">✕</button>
+      </div>`;
+    });
+  }
+
+  if(topIA.length){
+    html += '<div style="font-size:10px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin:12px 0 4px">🤖 Aprendidos por IA</div>';
+    topIA.forEach(([nombre,count])=>{
+      html += `<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--s2);border:1px solid var(--border);border-radius:8px;opacity:.8">
+        <span style="flex:1;font-size:13px">${nombre}</span>
+        <span style="font-size:10px;background:var(--accent);color:#fff;border-radius:10px;padding:2px 6px">${count}x</span>
+      </div>`;
+    });
+  }
+
+  if(!html) html = '<div style="color:var(--muted);font-size:12px;text-align:center;padding:20px">Sin productos aún</div>';
+  lista.innerHTML = html;
+}
+
+function agregarProductoManual(){
+  const nombre = document.getElementById('prodNombre').value.trim();
+  const precio = parseFloat(document.getElementById('prodPrecio').value)||0;
+  if(!nombre){ toast('❌ Escribe el nombre del producto'); return; }
+  const manuales = getProductosManuales();
+  if(manuales.find(p=>p.nombre.toLowerCase()===nombre.toLowerCase())){
+    toast('⚠️ Ese producto ya existe'); return;
+  }
+  manuales.push({nombre, precio});
+  saveProductosManuales(manuales);
+  document.getElementById('prodNombre').value='';
+  document.getElementById('prodPrecio').value='';
+  document.getElementById('prodNombre').focus();
+  renderListaProductosModal();
+  renderProductosPanel();
+  toast('✅ '+nombre+' agregado al menú');
+}
+
+function eliminarProductoManual(idx){
+  const manuales = getProductosManuales();
+  manuales.splice(idx,1);
+  saveProductosManuales(manuales);
+  renderListaProductosModal();
+  renderProductosPanel();
+  toast('🗑 Producto eliminado');
+}
+
+function limpiarFrecuentes(){
+  if(!confirm('¿Limpiar todos los productos aprendidos por la IA?\nLos productos manuales no se borran.')) return;
+  localStorage.removeItem('siryx_frecuentes');
+  renderListaProductosModal();
+  renderProductosPanel();
+  toast('🗑 Historial de IA limpiado');
 }
 
 // ══ INICIO ══
