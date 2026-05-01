@@ -2393,25 +2393,25 @@ function mostrarEstadoLicencia(){
   }
 }
 
+function initSplash(){
+  const s = document.getElementById('splash');
+  if(!s) return;
+  setTimeout(() => {
+    s.classList.add('hiding');
+    setTimeout(() => s.style.display = 'none', 600);
+  }, 2000);
+}
+
 function iniciarApp(){
   applyTheme();
-  actualizarBtnClave();
-  actualizarHeaderLogo();
-  if(cfg.mesero) document.getElementById('metaMesero').value=cfg.mesero;
-  document.getElementById('histBadge').textContent=comandas.length;
+  if(typeof actualizarBtnClave === 'function') actualizarBtnClave();
+  if(typeof actualizarHeaderLogo === 'function') actualizarHeaderLogo();
+  if(cfg.mesero && document.getElementById('metaMesero')) document.getElementById('metaMesero').value=cfg.mesero;
+  if(document.getElementById('histBadge')) document.getElementById('histBadge').textContent=comandas.length;
   initSplash();
-  setTimeout(renderDashboard, 2100);
-  if(!cfg.groqKey){ setTimeout(()=>showStatus('👋 Configura tu API Key de Groq en ⚙ para empezar','info'),2200); }
+  setTimeout(() => { if(typeof renderDashboard === 'function') renderDashboard(); }, 2100);
 }
 
 // ══ INIT ══
-applyTheme();
-
-if(checkLicencia()){
-  iniciarApp();
-} else {
-  document.getElementById('activationOverlay').style.display = 'flex';
-  mostrarEstadoLicencia();
-}
-</body>
-</html>
+document.addEventListener('DOMContentLoaded', () => {
+  applyTheme();
