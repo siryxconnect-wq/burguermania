@@ -176,10 +176,10 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
 /* DASHBOARD */
 .dash-layout{flex:1;overflow-y:auto;padding:32px;display:flex;flex-direction:column;gap:32px}
 .dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
-.dash-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--card-shadow);transition:var(--transition)}
+.dash-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--card-shadow);transition:var(--transition);color:var(--text)}
 .dash-card:hover{transform:translateY(-4px);border-color:var(--border-bright)}
 .dash-label{font-size:11px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:1px}
-.dash-value{font-family:var(--mono);font-size:28px;font-weight:800;color:#fff}
+.dash-value{font-family:var(--mono);font-size:28px;font-weight:800;color:var(--text)}
 .dash-sub{font-size:12px;color:var(--muted)}
 .dash-icon{font-size:24px;margin-bottom:4px;display:block}
 .charts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px}
@@ -322,6 +322,14 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
 .prod-chip .chip-count{font-size:9px;background:var(--accent);color:#fff;border-radius:10px;padding:1px 5px;flex-shrink:0}
 .prod-chip.manual{border-color:var(--orange);background:rgba(245,158,11,.06)}
 .prod-chip.manual:hover{border-color:var(--orange);background:rgba(245,158,11,.12)}
+
+/* Modo claro — dashboard */
+[data-theme="light"] .dash-value{color:var(--accent)!important}
+[data-theme="light"] .dash-label{color:var(--muted)}
+[data-theme="light"] .dash-sub{color:var(--muted)}
+[data-theme="light"] .chart-title{color:var(--muted)}
+[data-theme="light"] .hist-mesa{color:var(--text)!important}
+[data-theme="light"] .hist-num{color:var(--accent)}
 </style>
 </head>
 <body>
@@ -867,6 +875,8 @@ function iniciarApp(){
   });
   // Renderizar panel de productos
   setTimeout(renderProductosPanel, 500);
+  // Iniciar auto-archivado cada 2 horas
+  iniciarAutoArchivado();
 }
 
 function cerrarSesion(){
@@ -1630,12 +1640,16 @@ function renderHistorial(){
     return;
   }
   list.innerHTML = comandas.map((c,i)=>{
-    const estadoTag = c.estadoPago==='pagado'||c.estadoPago==='cortesia'
+    // Tags de estado
+    const tagEstado = c.estadoPago==='pagado'||c.estadoPago==='cortesia'
       ? `<span class="comanda-tag tag-pagada">${c.estadoPago==='cortesia'?'🎁 CORTESÍA':'✅ PAGADA'}</span>`
       : c.estadoPago==='cancelada' ? '<span class="comanda-tag tag-cancelada">❌ CANCELADA</span>'
-      : c.estadoPago==='fusionada' ? '<span class="comanda-tag tag-fusionada">🔗 FUSIONADA</span>'
-      : c.editadoEl ? '<span class="comanda-tag tag-editada">✏️ EDITADA</span>'
+      : c.estadoPago==='fusionada' ? '<span class="comanda-tag tag-fusionada">🔗 EN FUSIÓN</span>'
       : '<span class="comanda-tag tag-pendiente">⏳ PENDIENTE</span>';
+    // Tags adicionales de trazabilidad
+    const tagEditada = c.editadoEl ? '<span class="comanda-tag tag-editada" title="Editada el '+new Date(c.editadoEl).toLocaleString('es-CO',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+'">✏️ EDITADA</span>' : '';
+    const tagFusion = c.fusionadaDe ? '<span class="comanda-tag tag-fusionada">🔗 FUSIONADA</span>' : '';
+    const estadoTag = tagEstado + tagEditada + tagFusion;
     const traza = c.fusionadaDe
       ? `<div class="fusion-trace">🔗 <b>Fusión de:</b> ${c.fusionadaDe.map(i=>comandas[i]?'#'+comandas[i].id:'#?').join(' + ')}</div>`
       : c.estadoPago==='fusionada' && c.fusionadaEn
@@ -1911,25 +1925,29 @@ function archivarComandasDelDia(hoyStr){
   const archivo = getArchivo();
   const paraArchivar = comandas.filter(c=>c.fecha===hoyStr);
   if(!paraArchivar.length) return 0;
-  // Agregar al archivo con timestamp de cierre
   paraArchivar.forEach(cmd=>{
-    // Evitar duplicados
     if(!archivo.find(a=>a.id===cmd.id&&a.fecha===cmd.fecha)){
       archivo.push({...cmd, archivadoEl:new Date().toISOString()});
     }
   });
   saveArchivo(archivo);
-  // También sincronizar en Supabase si hay conexión
-  if(cfg.clienteId){
-    db.from('archivo_historico')
-      .upsert(paraArchivar.map(cmd=>({
-        id:cmd.id, cliente_id:cfg.clienteId,
-        datos:cmd, fecha:cmd.fecha,
-        archivado_el:new Date().toISOString()
-      })),{onConflict:'id,cliente_id'})
-      .then(({error})=>{ if(error) console.warn('Archivo Supabase:',error.message); });
-  }
+  // Quitar del historial activo
+  comandas = comandas.filter(c=>c.fecha!==hoyStr);
+  guardarLocal();
+  renderHistorial();
   return paraArchivar.length;
+}
+
+// Auto-archivar cada 2 horas
+function iniciarAutoArchivado(){
+  setInterval(()=>{
+    const hoy = new Date().toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit',year:'numeric'});
+    const n = archivarComandasDelDia(hoy);
+    if(n>0){
+      toast('🗂 Auto-archivado: '+n+' comandas archivadas');
+      renderDashboard();
+    }
+  }, 2 * 60 * 60 * 1000); // cada 2 horas
 }
 
 function accederArchivo(btn){
