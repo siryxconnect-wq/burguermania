@@ -392,12 +392,26 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
         <div class="meta-field"><label>Mesa / Cliente</label><input class="meta-input" id="metaMesa" placeholder="Mesa 4 / Carlos"></div>
         <div class="meta-field"><label>Mesero</label><input class="meta-input" id="metaMesero" placeholder="Nombre"></div>
         <div class="meta-field"><label>Tipo</label>
-          <select class="meta-input" id="metaTipo">
+          <select class="meta-input" id="metaTipo" onchange="toggleCamposDomicilio()">
             <option value="MESA">🍽 Mesa</option>
             <option value="DOMICILIO">🛵 Domicilio</option>
             <option value="PARA LLEVAR">🥡 Para llevar</option>
             <option value="BARRA">🪑 Barra</option>
           </select>
+        </div>
+      </div>
+
+      <!-- CAMPOS DOMICILIO — aparecen solo cuando tipo es DOMICILIO -->
+      <div id="camposDomicilio" style="display:none;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.3);border-radius:12px;padding:14px;display:none;flex-direction:column;gap:10px">
+        <div style="font-size:11px;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:1px">🛵 Datos del domicilio</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="meta-field"><label>Nombre completo</label><input class="meta-input" id="metaNombreCliente" placeholder="Ej: María García"></div>
+          <div class="meta-field"><label>Teléfono</label><input class="meta-input" id="metaTelefono" placeholder="Ej: 310 234 5678" type="tel"></div>
+        </div>
+        <div class="meta-field"><label>Dirección</label><input class="meta-input" id="metaDireccion" placeholder="Ej: Calle 45 # 23-10, Apto 302"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="meta-field"><label>Barrio</label><input class="meta-input" id="metaBarrio" placeholder="Ej: El Poblado"></div>
+          <div class="meta-field"><label>Referencias</label><input class="meta-input" id="metaReferencias" placeholder="Ej: Casa amarilla, al lado del parque"></div>
         </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:6px">
@@ -879,6 +893,19 @@ function iniciarApp(){
   iniciarAutoArchivado();
 }
 
+
+function toggleCamposDomicilio(){
+  const tipo = document.getElementById('metaTipo').value;
+  const campos = document.getElementById('camposDomicilio');
+  if(tipo === 'DOMICILIO'){
+    campos.style.display = 'flex';
+    document.getElementById('metaMesa').placeholder = 'Nombre del cliente';
+  } else {
+    campos.style.display = 'none';
+    document.getElementById('metaMesa').placeholder = 'Mesa 4 / Carlos';
+  }
+}
+
 function cerrarSesion(){
   if(!confirm('¿Cerrar sesión?\n\nTendrás que ingresar tu ID nuevamente para entrar.')) return;
   // Limpiar sesión pero mantener configuración
@@ -1027,6 +1054,11 @@ function limpiarTodo(){
   document.getElementById('metaMesa').value = '';
   document.getElementById('metaNotas').value = '';
   document.getElementById('metaTipo').value = 'MESA';
+  // Limpiar campos domicilio
+  ['metaNombreCliente','metaTelefono','metaDireccion','metaBarrio','metaReferencias'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  toggleCamposDomicilio();
   document.getElementById('metaMesero').value = cfg.mesero || '';
   ordenActual = null;
   document.getElementById('ticketPreview').innerHTML = '<div class="ticket-empty">La comanda<br>aparecerá aquí</div>';
@@ -1066,6 +1098,14 @@ async function procesarPedido(){
   const mesero = document.getElementById('metaMesero').value || '';
   const tipo = document.getElementById('metaTipo').value;
   const notas = document.getElementById('metaNotas').value || '';
+  // Datos domicilio
+  const domicilio = tipo==='DOMICILIO' ? {
+    nombre: document.getElementById('metaNombreCliente').value.trim(),
+    telefono: document.getElementById('metaTelefono').value.trim(),
+    direccion: document.getElementById('metaDireccion').value.trim(),
+    barrio: document.getElementById('metaBarrio').value.trim(),
+    referencias: document.getElementById('metaReferencias').value.trim()
+  } : null;
   const numOrden = String(counter).padStart(4,'0');
   const prompt = `Eres el sistema de comandas de un restaurante colombiano. Analiza este texto de WhatsApp y extrae el pedido completo.
 
@@ -1129,7 +1169,8 @@ REGLAS PARA MESA/MESERO/TIPO:
     if(!mesero&&parsed.mesero) document.getElementById('metaMesero').value = parsed.mesero;
     ordenActual = {id:numOrden, resto:cfg.resto||'Restaurante', mesa:mesaFinal, mesero:meseroFinal, tipo:tipoFinal, notas,
       items:parsed.items, tiene_precios:parsed.tiene_precios||false,
-      subtotal:parsed.subtotal||0, resumen:parsed.resumen||'', fecha, hora, timestamp:now.toISOString()};
+      subtotal:parsed.subtotal||0, resumen:parsed.resumen||'', fecha, hora, timestamp:now.toISOString(),
+      domicilio: domicilio};
     renderTicket(ordenActual);
     playPrintSound();
     const tw = document.getElementById('ticketPreview');
@@ -1160,6 +1201,16 @@ function renderTicket(o){
   html += `<div class="t-line"></div>`;
   if(o.tipo||o.mesa) html += `<div style="font-size:10px"><b>${o.tipo||''}</b>${o.mesa?' — '+o.mesa:''}</div>`;
   if(o.mesero) html += `<div style="font-size:10px">Mesero: ${o.mesero}</div>`;
+  // Datos domicilio en el ticket
+  if(o.domicilio && o.tipo==='DOMICILIO'){
+    html += '<div class="t-double"></div>';
+    html += '<div style="font-size:10px;font-weight:700;text-align:center">🛵 DATOS DEL DOMICILIO</div>';
+    if(o.domicilio.nombre) html += `<div style="font-size:10px"><b>Cliente:</b> ${o.domicilio.nombre}</div>`;
+    if(o.domicilio.telefono) html += `<div style="font-size:10px"><b>Tel:</b> ${o.domicilio.telefono}</div>`;
+    if(o.domicilio.direccion) html += `<div style="font-size:10px"><b>Dir:</b> ${o.domicilio.direccion}</div>`;
+    if(o.domicilio.barrio) html += `<div style="font-size:10px"><b>Barrio:</b> ${o.domicilio.barrio}</div>`;
+    if(o.domicilio.referencias) html += `<div style="font-size:10px;font-style:italic"><b>Ref:</b> ${o.domicilio.referencias}</div>`;
+  }
   html += `<div class="t-line"></div>`;
   o.items.forEach(item=>{
     const lineTotal = item.qty * (item.unit_price||0);
@@ -1200,6 +1251,15 @@ function generarTextoPlano(o){
   lines.push(S2); lines.push(center(`ORDEN #${o.id}`)); lines.push(center(`${o.fecha}  ${o.hora}`)); lines.push(S1);
   if(o.tipo||o.mesa) lines.push(`${o.tipo||''}${o.mesa?' - '+o.mesa:''}`);
   if(o.mesero) lines.push(`Mesero: ${o.mesero}`);
+  if(o.domicilio && o.tipo==='DOMICILIO'){
+    lines.push(S2);
+    lines.push(center('DATOS DEL DOMICILIO'));
+    if(o.domicilio.nombre) lines.push('Cliente: '+o.domicilio.nombre);
+    if(o.domicilio.telefono) lines.push('Tel: '+o.domicilio.telefono);
+    if(o.domicilio.direccion) lines.push('Dir: '+o.domicilio.direccion);
+    if(o.domicilio.barrio) lines.push('Barrio: '+o.domicilio.barrio);
+    if(o.domicilio.referencias) lines.push('Ref: '+o.domicilio.referencias);
+  }
   lines.push(S1);
   o.items.forEach(item=>{
     const lt = item.qty * (item.unit_price||0);
