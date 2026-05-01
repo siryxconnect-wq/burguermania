@@ -1430,12 +1430,16 @@ function editarComanda(idx){
   document.getElementById('editarInfo').textContent = 'Comanda #'+cmd.id+' · '+(cmd.mesa||'Sin mesa')+' · '+cmd.fecha+' '+cmd.hora;
   document.getElementById('editarNotas').value = cmd.notas||'';
   const cont = document.getElementById('editarItems');
-  cont.innerHTML = (cmd.items||[]).map((item,i)=>
-    '<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--bg2);border-radius:6px;border:1px solid var(--border)">'
-    +'<span style="flex:1;font-size:12px">'+(item.qty||1)+'x '+(item.name||item.nombre||'')+(item.unit_price?' — '+fmtNum(item.unit_price):'')+'</span>'
-    +'<button onclick="quitarItemEditar('+i+')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:0 4px">✕</button>'
-    +'</div>'
-  ).join('');
+  cont.innerHTML = (cmd.items||[]).map((item,i)=>{
+    const nombre = item.name||item.nombre||'?';
+    const precio = item.unit_price||item.precio||0;
+    const qty = item.qty||item.cantidad||1;
+    return '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border)">'
+      +'<span style="flex:1;font-size:13px;font-weight:600">'+qty+'x '+nombre+'</span>'
+      +(precio?'<span style="font-family:var(--mono);font-size:12px;color:var(--accent)">'+fmtNum(precio*qty)+'</span>':'')
+      +'<button onclick="quitarItemEditar('+i+')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0 4px" title="Quitar ítem">✕</button>'
+      +'</div>';
+  }).join('');
   document.getElementById('modalEditar').style.display = 'flex';
   setTimeout(renderSugerencias, 100);
 }
@@ -1451,16 +1455,28 @@ function agregarItemEditar(){
   const precio = parseFloat(document.getElementById('editarNuevoPrecio').value)||0;
   if(!nombre){ toast('❌ Escribe el nombre del ítem'); return; }
   if(!comandas[_editIdx].items) comandas[_editIdx].items = [];
-  comandas[_editIdx].items.push({qty:1, name:nombre, unit_price:precio});
+  // Usar siempre name y unit_price para consistencia
+  comandas[_editIdx].items.push({qty:1, name:nombre, unit_price:precio, note:''});
+  // Si tiene precio, marcar que la comanda tiene precios
+  if(precio>0) comandas[_editIdx].tiene_precios = true;
   recalcularSubtotal(_editIdx);
   document.getElementById('editarNuevoItem').value = '';
   document.getElementById('editarNuevoPrecio').value = '';
   editarComanda(_editIdx);
+  toast('✅ '+nombre+' agregado');
 }
 function recalcularSubtotal(idx){
   const items = comandas[idx].items||[];
-  const total = items.reduce((a,it)=>a+((it.unit_price||it.precio||0)*(it.qty||it.cantidad||1)),0);
-  if(total>0) comandas[idx].subtotal = total;
+  // Soportar ambos formatos: name/unit_price (IA) y nombre/precio (manual)
+  const total = items.reduce((a,it)=>{
+    const precio = it.unit_price||it.precio||0;
+    const qty = it.qty||it.cantidad||1;
+    return a + (precio*qty);
+  },0);
+  if(total>0){
+    comandas[idx].subtotal = total;
+    comandas[idx].tiene_precios = true;
+  }
 }
 function guardarEdicion(){
   if(_editIdx===null) return;
