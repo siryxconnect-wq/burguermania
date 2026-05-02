@@ -1970,14 +1970,14 @@ function archivarComanda(i){
 
 async function guardarComandaArchivedSupabase(comanda){
   if(!cfg.clienteId) return;
+  const supaId = getSupabaseId(comanda);
   try{
-    await db.from('comandas').upsert({
-      id: getSupabaseId(comanda),
-      cliente_id: cfg.clienteId,
-      datos: comanda,
-      archivada: true,
-      updated_at: new Date().toISOString()
-    }, { onConflict: 'id,cliente_id' });
+    const { error } = await db
+      .from('comandas')
+      .update({ datos: comanda, archivada: true, updated_at: new Date().toISOString() })
+      .eq('id', supaId)
+      .eq('cliente_id', cfg.clienteId);
+    if(error) throw error;
   } catch(e){
     console.warn('Error archivando en Supabase:', e.message);
   }
@@ -2161,6 +2161,7 @@ async function cargarComandasSupabase(){
       comandas = activas;
       localStorage.setItem('siryx_comandas', JSON.stringify(comandas));
       document.getElementById('histBadge').textContent = comandas.length;
+      console.log('✅ Supabase cargó', activas.length, 'comandas activas y', archivadas.length, 'archivadas');
       // Cargar archivo (merge con lo que ya hay en local para no perder nada)
       const archivoLocal = getArchivo();
       archivadas.forEach(cmd => {
@@ -2178,18 +2179,34 @@ async function cargarComandasSupabase(){
 
 async function guardarComandaSupabase(comanda){
   if(!cfg.clienteId) return;
+  const supaId = getSupabaseId(comanda);
   try{
-    const { error } = await db
+    // Intentar actualizar primero
+    const { data: existing } = await db
       .from('comandas')
-      .upsert({
-        id: getSupabaseId(comanda),
-        cliente_id: cfg.clienteId,
-        datos: comanda,
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'id,cliente_id' });
-    if(error) throw error;
+      .select('id')
+      .eq('id', supaId)
+      .eq('cliente_id', cfg.clienteId)
+      .maybeSingle();
+
+    if(existing){
+      // Ya existe → actualizar
+      const { error } = await db
+        .from('comandas')
+        .update({ datos: comanda, updated_at: new Date().toISOString() })
+        .eq('id', supaId)
+        .eq('cliente_id', cfg.clienteId);
+      if(error) throw error;
+    } else {
+      // No existe → insertar
+      const { error } = await db
+        .from('comandas')
+        .insert({ id: supaId, cliente_id: cfg.clienteId, datos: comanda, updated_at: new Date().toISOString() });
+      if(error) throw error;
+    }
+    console.log('✅ Comanda guardada en Supabase:', supaId);
   } catch(e){
-    console.warn('Error guardando en Supabase:', e.message);
+    console.error('❌ Error guardando en Supabase:', e.message);
   }
 }
 
