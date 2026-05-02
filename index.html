@@ -106,7 +106,7 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
 .preview-panel{background:var(--s1);border-left:1px solid var(--border);display:flex;flex-direction:column;height:100%;overflow:hidden}
 .preview-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
 .preview-title{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px}
-.preview-scroll{flex:1;padding:16px;overflow-y:auto;display:flex;justify-content:center;align-items:flex-start}
+.preview-scroll{flex:1;padding:16px;overflow-y:auto;display:flex;justify-content:center;align-items:flex-start;background:#e5e5e5}
 .section-label{font-family:var(--display);font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px}
 .meta-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
 .meta-field{display:flex;flex-direction:column;gap:6px}
@@ -162,7 +162,7 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
 
 /* HISTORIAL */
 .historial-layout{flex:1;overflow-y:auto;padding:32px;display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:24px}
-.hist-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;display:flex;flex-direction:column;gap:16px;transition:var(--transition);box-shadow:var(--card-shadow)}
+.hist-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;display:flex;flex-direction:column;gap:16px;transition:var(--transition);box-shadow:var(--card-shadow);overflow:hidden}
 .hist-card:hover{transform:translateY(-4px);border-color:var(--accent)}
 .hist-header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--border);padding-bottom:16px}
 .hist-info{display:flex;flex-direction:column;gap:4px;min-width:0}
@@ -172,7 +172,7 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
 .hist-total{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--green)}
 .hist-body{font-size:14px;color:var(--text);line-height:1.6}
 .hist-items{max-height:150px;overflow-y:auto;padding-right:8px}
-.hist-actions{display:flex;gap:10px;padding-top:16px;border-top:1px solid var(--border);margin-top:auto}
+.hist-actions{display:flex;gap:8px;padding-top:16px;border-top:1px solid var(--border);margin-top:auto;flex-wrap:wrap;align-items:center}
 
 /* DASHBOARD */
 .dash-layout{flex:1;overflow-y:auto;padding:32px;display:flex;flex-direction:column;gap:32px}
@@ -351,10 +351,10 @@ main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
 .ticket-wrap, .ticket-wrap *,
 .ticket-wrap div, .ticket-wrap span, .ticket-wrap b {
   color: #000 !important;
-  background-color: transparent !important;
 }
 .ticket-wrap { background-color: #fff !important; }
-.ticket-empty { color: #bbb !important; }
+#ticketPreview { background-color: #fff !important; border-radius: 2px; }
+.ticket-empty { color: #bbb !important; background-color: #fff !important; }
 
 /* Options del select en modo claro y oscuro */
 [data-theme="dark"] select option { background:#0a0c12; color:#f8fafc; }
@@ -1934,10 +1934,25 @@ function renderHistorial(){
         ${c.estadoPago!=='cancelada'&&c.estadoPago!=='fusionada'&&c.estadoPago!=='pagado'&&c.estadoPago!=='cortesia'
           ? `<button class="btn btn-primary btn-sm" onclick="registrarPagoHistorial(${i})" title="Registrar el pago de esta comanda">💳 Pagar</button>` : ''}
         ${c.estadoPago==='fusionada' ? '<span style="font-size:10px;color:#9333ea;padding:4px 8px;border:1px solid #9333ea;border-radius:4px">📎 En fusión</span>' : ''}
+        <button class="btn btn-secondary btn-sm" onclick="archivarComanda(${i})" style="color:var(--accent2)" title="Archivar esta comanda sin necesidad de clave">🗂 Archivar</button>
         <button class="btn btn-secondary btn-sm" onclick="eliminarComanda(${i})" style="color:var(--red)" title="Eliminar permanentemente esta comanda (requiere clave admin)">🗑</button>
       </div>
     </div>`;
   }).join('');
+}
+function archivarComanda(i){
+  const cmd = comandas[i];
+  if(!cmd) return;
+  const archivo = getArchivo();
+  if(!archivo.find(a=>a.id===cmd.id&&a.fecha===cmd.fecha)){
+    archivo.push({...cmd, archivadoEl:new Date().toISOString()});
+    saveArchivo(archivo);
+  }
+  comandas.splice(i,1);
+  guardarLocal();
+  renderHistorial();
+  renderDashboard();
+  toast('🗂 Comanda #'+cmd.id+' archivada');
 }
 function reimprimirHist(i){ ordenActual=comandas[i]; renderTicket(comandas[i]); imprimirWindows(); }
 function copiarHist(i){ navigator.clipboard.writeText(generarTextoPlano(comandas[i])).then(()=>toast('✅ Copiado')).catch(()=>toast('✅ Copiado')); }
