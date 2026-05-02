@@ -2285,106 +2285,137 @@ function accederArchivo(btn){
 }
 
 function inicializarFiltrosArchivo(){
-  const archivo = getArchivo();
-  const anios = [...new Set(archivo.map(c=>{
-    if(!c.fecha) return null;
-    // fecha formato dd/mm/yyyy
-    const partes = c.fecha.split('/');
-    return partes.length===3 ? partes[2] : null;
-  }).filter(Boolean))].sort((a,b)=>b-a);
-  const sel = document.getElementById('archivoFiltroAnio');
-  sel.innerHTML = anios.length
-    ? anios.map(a=>`<option value="${a}">${a}</option>`).join('')
-    : `<option value="${new Date().getFullYear()}">${new Date().getFullYear()}</option>`;
-  // Poner fecha de hoy por defecto
-  const hoy = new Date().toISOString().split('T')[0];
-  document.getElementById('archivoFiltroDia').value = hoy;
-  // Poner mes actual
-  document.getElementById('archivoFiltroMes').value = new Date().getMonth()+1;
+  try {
+    const archivo = getArchivo();
+    if(!Array.isArray(archivo)) return;
+
+    const anios = [...new Set(archivo.map(c=>{
+      if(!c || typeof c.fecha !== 'string') return null;
+      // fecha formato dd/mm/yyyy
+      const partes = c.fecha.split('/');
+      return partes.length===3 ? partes[2] : null;
+    }).filter(Boolean))].sort((a,b)=>b-a);
+
+    const sel = document.getElementById('archivoFiltroAnio');
+    if(sel){
+      sel.innerHTML = anios.length
+        ? anios.map(a=>`<option value="${a}">${a}</option>`).join('')
+        : `<option value="${new Date().getFullYear()}">${new Date().getFullYear()}</option>`;
+    }
+
+    // Poner fecha de hoy por defecto
+    const hoy = new Date().toISOString().split('T')[0];
+    const diaEl = document.getElementById('archivoFiltroDia');
+    if(diaEl) diaEl.value = hoy;
+
+    // Poner mes actual
+    const mesEl = document.getElementById('archivoFiltroMes');
+    if(mesEl) mesEl.value = new Date().getMonth()+1;
+  } catch(err) {
+    console.error("Error inicializando filtros de archivo:", err);
+  }
 }
 
 function renderArchivo(){
-  const tipo = document.getElementById('archivoFiltroTipo').value;
-  const anio = document.getElementById('archivoFiltroAnio').value;
-  const diaEl = document.getElementById('archivoFiltroDia');
-  const mesEl = document.getElementById('archivoFiltroMes');
+  try {
+    const tipoEl = document.getElementById('archivoFiltroTipo');
+    const anioEl = document.getElementById('archivoFiltroAnio');
+    const diaEl = document.getElementById('archivoFiltroDia');
+    const mesEl = document.getElementById('archivoFiltroMes');
+    
+    if(!tipoEl || !anioEl || !diaEl || !mesEl) return;
 
-  // Mostrar/ocultar filtros según tipo
-  diaEl.style.display = tipo==='dia' ? 'block' : 'none';
-  mesEl.style.display = tipo==='mes' ? 'block' : 'none';
+    const tipo = tipoEl.value;
+    const anio = anioEl.value;
 
-  const archivo = getArchivo();
-  let filtradas = [];
+    // Mostrar/ocultar filtros según tipo
+    diaEl.style.display = tipo==='dia' ? 'block' : 'none';
+    mesEl.style.display = tipo==='mes' ? 'block' : 'none';
 
-  if(tipo==='todas'){
-    filtradas = [...archivo];
-  } else if(tipo==='dia'){
-    const diaVal = diaEl.value; // yyyy-mm-dd
-    if(!diaVal) return;
-    const partes = diaVal.split('-');
-    const diaFmt = partes[2]+'/'+partes[1]+'/'+partes[0];
-    filtradas = archivo.filter(c=>c.fecha===diaFmt);
-  } else if(tipo==='mes'){
-    const mes = String(mesEl.value).padStart(2,'0');
-    filtradas = archivo.filter(c=>c.fecha&&c.fecha.slice(3,5)===mes&&c.fecha.slice(6)===anio);
-  } else {
-    filtradas = archivo.filter(c=>c.fecha&&c.fecha.slice(6)===anio);
-  }
+    const archivo = getArchivo();
+    let filtradas = [];
 
-  const list = document.getElementById('archivoList');
-  const totalVentas = filtradas.reduce((a,c)=>a+(c.subtotal||0),0);
-  const pagadas = filtradas.filter(c=>c.estadoPago==='pagado'||c.estadoPago==='cortesia').length;
-  document.getElementById('archivoResumen').innerHTML =
-    `<b style="color:var(--accent)">${filtradas.length}</b> comandas · `+
-    `<b style="color:var(--green)">${fmtNum(totalVentas)}</b> total · `+
-    `<b>${pagadas}</b> pagadas`;
-
-  if(!filtradas.length){
-    list.innerHTML='<div style="text-align:center;padding:60px;color:var(--muted);grid-column:1/-1"><div style="font-size:48px;opacity:.2;margin-bottom:16px">🗂</div><div style="font-weight:600">Sin comandas archivadas en este período</div></div>';
-    return;
-  }
-
-  // Ordenar por fecha y hora más reciente
-  filtradas.sort((a,b)=>new Date(b.timestamp||0)-new Date(a.timestamp||0));
-
-  list.innerHTML = filtradas.map(c=>{
-    try {
-      const items = c.items || [];
-      const estadoColor = c.estadoPago==='pagado'?'var(--green)':c.estadoPago==='cancelada'?'var(--red)':'var(--orange)';
-      const estadoLabel = c.estadoPago==='pagado'?'✅ Pagada':c.estadoPago==='cortesia'?'🎁 Cortesía':c.estadoPago==='cancelada'?'❌ Cancelada':'⏳ Pendiente';
-      const metodosPago = c.pago ? Object.entries(c.pago)
-        .filter(([k,v])=>k!=='descuento'&&k!=='cortesia'&&typeof v==='number')
-        .map(([k,v])=>`${k}: ${fmtNum(v)}`).join(' · ') : '';
-      
-      return `<div class="hist-card" style="opacity:0.95">
-        <div class="hist-header">
-          <div class="hist-info">
-            <div class="hist-num">#${c.id || '---'}</div>
-            <div class="hist-mesa">${c.mesa||'Sin Mesa'}</div>
-            <div class="hist-meta">${c.fecha || ''} · ${c.hora || ''} · ${c.tipo||'S/T'}</div>
-          </div>
-          <div>
-            <div class="hist-total">${c.tiene_precios?fmtNum(c.subtotal):items.length+' ítems'}</div>
-            <div style="font-size:10px;color:${estadoColor};font-weight:700;text-align:right;margin-top:4px">${estadoLabel}</div>
-          </div>
-        </div>
-        <div class="hist-items" style="font-size:13px">
-          ${items.slice(0,4).map(it=>{
-            if(!it) return '';
-            return `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.03)">
-            <span><b style="color:var(--accent)">${it.qty||it.cantidad||1}x</b> ${it.name||it.nombre||'?'}</span>
-            ${c.tiene_precios&&(it.unit_price||it.precio)?`<span style="font-family:var(--mono);color:var(--muted);font-size:11px">${fmtNum((it.qty||it.cantidad||1)*(it.unit_price||it.precio||0))}</span>`:''}
-          </div>`}).join('')}
-          ${items.length>4?`<div style="font-size:10px;color:var(--muted);margin-top:4px">+${items.length-4} ítems más</div>`:''}
-        </div>
-        ${metodosPago?`<div style="font-size:11px;color:var(--muted);font-family:var(--mono);padding-top:8px;border-top:1px solid var(--border)">${metodosPago}</div>`:''}
-        ${c.notas?`<div style="font-size:11px;color:var(--muted)">📝 ${c.notas}</div>`:''}
-      </div>`;
-    } catch(err) {
-      console.error("Error renderizando comanda archivada:", err, c);
-      return ''; // No romper el resto de la lista
+    if(tipo==='todas'){
+      filtradas = [...archivo];
+    } else if(tipo==='dia'){
+      const diaVal = diaEl.value; // yyyy-mm-dd
+      if(!diaVal){ 
+        document.getElementById('archivoList').innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)">Selecciona una fecha</div>';
+        return; 
+      }
+      const partes = diaVal.split('-');
+      const diaFmt = partes[2]+'/'+partes[1]+'/'+partes[0];
+      filtradas = archivo.filter(c=>c.fecha===diaFmt);
+    } else if(tipo==='mes'){
+      const mes = String(mesEl.value).padStart(2,'0');
+      filtradas = archivo.filter(c=>c.fecha&&c.fecha.slice(3,5)===mes&&c.fecha.slice(6)===anio);
+    } else {
+      filtradas = archivo.filter(c=>c.fecha&&c.fecha.slice(6)===anio);
     }
-  }).join('');
+
+    const list = document.getElementById('archivoList');
+    if(!list) return;
+
+    const totalVentas = filtradas.reduce((a,c)=>a+(c.subtotal||0),0);
+    const pagadas = filtradas.filter(c=>c.estadoPago==='pagado'||c.estadoPago==='cortesia').length;
+    
+    const resumenEl = document.getElementById('archivoResumen');
+    if(resumenEl){
+      resumenEl.innerHTML =
+        `<b style="color:var(--accent)">${filtradas.length}</b> comandas · `+
+        `<b style="color:var(--green)">${fmtNum(totalVentas)}</b> total · `+
+        `<b>${pagadas}</b> pagadas`;
+    }
+
+    if(!filtradas.length){
+      list.innerHTML='<div style="text-align:center;padding:60px;color:var(--muted);grid-column:1/-1"><div style="font-size:48px;opacity:.2;margin-bottom:16px">🗂</div><div style="font-weight:600">Sin comandas archivadas en este período</div></div>';
+      return;
+    }
+
+    // Ordenar por fecha y hora más reciente
+    filtradas.sort((a,b)=>new Date(b.timestamp||0)-new Date(a.timestamp||0));
+
+    list.innerHTML = filtradas.map(c=>{
+      try {
+        const items = c.items || [];
+        const estadoColor = c.estadoPago==='pagado'?'var(--green)':c.estadoPago==='cancelada'?'var(--red)':'var(--orange)';
+        const estadoLabel = c.estadoPago==='pagado'?'✅ Pagada':c.estadoPago==='cortesia'?'🎁 Cortesía':c.estadoPago==='cancelada'?'❌ Cancelada':'⏳ Pendiente';
+        const metodosPago = c.pago ? Object.entries(c.pago)
+          .filter(([k,v])=>k!=='descuento'&&k!=='cortesia'&&typeof v==='number')
+          .map(([k,v])=>`${k}: ${fmtNum(v)}`).join(' · ') : '';
+        
+        return `<div class="hist-card" style="opacity:0.95">
+          <div class="hist-header">
+            <div class="hist-info">
+              <div class="hist-num">#${c.id || '---'}</div>
+              <div class="hist-mesa">${c.mesa||'Sin Mesa'}</div>
+              <div class="hist-meta">${c.fecha || ''} · ${c.hora || ''} · ${c.tipo||'S/T'}</div>
+            </div>
+            <div>
+              <div class="hist-total">${c.tiene_precios?fmtNum(c.subtotal):items.length+' ítems'}</div>
+              <div style="font-size:10px;color:${estadoColor};font-weight:700;text-align:right;margin-top:4px">${estadoLabel}</div>
+            </div>
+          </div>
+          <div class="hist-items" style="font-size:13px">
+            ${items.slice(0,4).map(it=>{
+              if(!it) return '';
+              return `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.03)">
+              <span><b style="color:var(--accent)">${it.qty||it.cantidad||1}x</b> ${it.name||it.nombre||'?'}</span>
+              ${c.tiene_precios&&(it.unit_price||it.precio)?`<span style="font-family:var(--mono);color:var(--muted);font-size:11px">${fmtNum((it.qty||it.cantidad||1)*(it.unit_price||it.precio||0))}</span>`:''}
+            </div>`}).join('')}
+            ${items.length>4?`<div style="font-size:10px;color:var(--muted);margin-top:4px">+${items.length-4} ítems más</div>`:''}
+          </div>
+          ${metodosPago?`<div style="font-size:11px;color:var(--muted);font-family:var(--mono);padding-top:8px;border-top:1px solid var(--border)">${metodosPago}</div>`:''}
+          ${c.notas?`<div style="font-size:11px;color:var(--muted)">📝 ${c.notas}</div>`:''}
+        </div>`;
+      } catch(err) {
+        console.error("Error renderizando comanda archivada:", err, c);
+        return '';
+      }
+    }).join('');
+  } catch(err) {
+    console.error("Error en renderArchivo:", err);
+  }
 }
 
 
