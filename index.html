@@ -1881,7 +1881,7 @@ function renderHistorial(){
     list.innerHTML += '<div style="text-align:center;padding:60px;color:var(--muted);grid-column:1/-1"><div style="font-size:48px;opacity:.2;margin-bottom:16px">📋</div><div style="font-weight:600">Sin comandas registradas</div></div>';
     return;
   }
-  list.innerHTML = comandas.map((c,i)=>{
+  list.innerHTML += comandas.map((c,i)=>{
     // Tags de estado
     const tagEstado = c.estadoPago==='pagado'||c.estadoPago==='cortesia'
       ? `<span class="comanda-tag tag-pagada">${c.estadoPago==='cortesia'?'🎁 CORTESÍA':'✅ PAGADA'}</span>`
