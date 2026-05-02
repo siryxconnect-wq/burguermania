@@ -948,10 +948,11 @@ function iniciarApp(){
   if(cfg.mesero && document.getElementById('metaMesero')) document.getElementById('metaMesero').value = cfg.mesero;
   const s = document.getElementById('splash');
   if(s){ s.classList.add('hiding'); setTimeout(()=>s.style.display='none',600); }
-  // Cargar comandas desde Supabase
+  // Cargar comandas desde Supabase y activar sincronización en tiempo real
   cargarComandasSupabase().then(()=>{
     document.getElementById('histBadge').textContent = comandas.length;
     setTimeout(renderDashboard, 300);
+    iniciarRealtimeSync(); // 🔄 Escuchar cambios en tiempo real desde otros dispositivos
   });
   // Renderizar paneles
   setTimeout(renderProductosPanel, 500);
@@ -961,6 +962,33 @@ function iniciarApp(){
 }
 
 
+
+// ══ REALTIME SYNC ══
+let realtimeChannel = null;
+function iniciarRealtimeSync(){
+  if(!cfg.clienteId) return;
+  if(realtimeChannel) realtimeChannel.unsubscribe();
+
+  realtimeChannel = db
+    .channel('comandas-sync-'+cfg.clienteId)
+    .on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'comandas',
+      filter: 'cliente_id=eq.'+cfg.clienteId
+    }, payload => {
+      // Cualquier cambio en Supabase → recargar todo
+      cargarComandasSupabase().then(()=>{
+        renderHistorial();
+        document.getElementById('histBadge').textContent = comandas.length;
+      });
+    })
+    .subscribe(status => {
+      if(status === 'SUBSCRIBED'){
+        console.log('✅ Realtime conectado — sincronización activa');
+      }
+    });
+}
 
 function cambiarEstadoDomicilio(idx){
   const estados = ['pendiente','en_camino','entregado'];
