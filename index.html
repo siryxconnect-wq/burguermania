@@ -560,23 +560,7 @@ select { appearance:auto; }
     </div>
   </div>
 
-<!-- MODAL ARCHIVO HISTÓRICO (SOLUCIÓN DEFINITIVA) -->
-<div class="modal-overlay" id="modalArchivoV2">
-  <div class="modal" style="max-width:900px; height:90vh; display:flex; flex-direction:column">
-    <div class="modal-title">📂 Archivo Histórico de Comandas
-      <button onclick="document.getElementById('modalArchivoV2').classList.remove('open')" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;float:right">✕</button>
-    </div>
-    <div style="padding:15px; background:var(--s2); border-radius:8px; margin-bottom:15px; display:flex; gap:10px; flex-wrap:wrap; align-items:center">
-       <span style="font-size:12px; font-weight:700">Filtrar por día:</span>
-       <input type="date" id="archV2Dia" class="meta-input" style="width:140px; font-size:12px" onchange="renderArchivoV2()">
-       <button onclick="renderArchivoV2('todas')" class="btn btn-secondary" style="font-size:11px">Ver Todas</button>
-       <div id="archV2Resumen" style="font-size:11px; color:var(--muted); margin-left:auto"></div>
-    </div>
-    <div id="archV2List" style="flex:1; overflow-y:auto; display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:15px; padding-bottom:20px"></div>
   </div>
-</div>
-
-</div>
 </main>
 
 <!-- MODALES -->
@@ -2276,9 +2260,19 @@ function archivarDiasAnteriores(){
 //  ARCHIVO HISTÓRICO V2 (MODAL)
 // ══════════════════════════════════════════
 function abrirArchivoV2(){
-  document.getElementById('archV2Dia').value = new Date().toISOString().split('T')[0];
-  document.getElementById('modalArchivoV2').classList.add('open');
-  renderArchivoV2('todas');
+  try {
+    const diaEl = document.getElementById('archV2Dia');
+    const modal = document.getElementById('modalArchivoV2');
+    if(!diaEl || !modal){
+      alert("Error: No se encontró el componente del archivo en el sistema.");
+      return;
+    }
+    diaEl.value = new Date().toISOString().split('T')[0];
+    modal.classList.add('open');
+    renderArchivoV2('todas');
+  } catch(err) {
+    alert("Error al abrir archivo: " + err.message);
+  }
 }
 
 function renderArchivoV2(modo){
@@ -2726,5 +2720,20 @@ function detectarDatosCliente(texto){
   if(dir) dir.style.borderColor = dir.value ? 'var(--green)' : 'rgba(239,68,68,.8)';
 }
 </script>
+<!-- MODAL ARCHIVO HISTÓRICO (POSICIÓN SEGURA) -->
+<div class="modal-overlay" id="modalArchivoV2">
+  <div class="modal" style="max-width:900px; height:90vh; display:flex; flex-direction:column">
+    <div class="modal-title">📂 Archivo Histórico de Comandas
+      <button onclick="document.getElementById('modalArchivoV2').classList.remove('open')" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;float:right">✕</button>
+    </div>
+    <div style="padding:15px; background:var(--s2); border-radius:8px; margin-bottom:15px; display:flex; gap:10px; flex-wrap:wrap; align-items:center">
+       <span style="font-size:12px; font-weight:700">Filtrar por día:</span>
+       <input type="date" id="archV2Dia" class="meta-input" style="width:140px; font-size:12px" onchange="renderArchivoV2()">
+       <button onclick="renderArchivoV2('todas')" class="btn btn-secondary" style="font-size:11px">Ver Todas</button>
+       <div id="archV2Resumen" style="font-size:11px; color:var(--muted); margin-left:auto"></div>
+    </div>
+    <div id="archV2List" style="flex:1; overflow-y:auto; display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:15px; padding-bottom:20px"></div>
+  </div>
+</div>
 </body>
 </html>
