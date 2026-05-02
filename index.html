@@ -1946,7 +1946,8 @@ function archivarComanda(i){
   if(!cmd) return;
   // Guardar en archivo local
   const archivo = getArchivo();
-  if(!archivo.find(a=>a.id===cmd.id)){
+  // Verificar duplicados por ID y fecha para evitar descartes erróneos
+  if(!archivo.find(a=>a.id===cmd.id && a.fecha===cmd.fecha)){
     archivo.push({...cmd, archivadoEl:new Date().toISOString()});
     saveArchivo(archivo);
   }
@@ -1964,7 +1965,7 @@ async function guardarComandaArchivedSupabase(comanda){
   if(!cfg.clienteId) return;
   try{
     await db.from('comandas').upsert({
-      id: comanda.id,
+      id: getSupabaseId(comanda),
       cliente_id: cfg.clienteId,
       datos: comanda,
       archivada: true,
@@ -2037,10 +2038,11 @@ function limpiarErrPin(){ document.getElementById('errPin').textContent=''; }
 function closeVerificar(){ document.getElementById('modalVerificar').classList.remove('open'); pendingDeleteIdx=null; }
 function confirmarEliminar(){const val=document.getElementById('pinVerificar').value;if(hashSimple(val)!==cfg.adminHash){document.getElementById('errPin').textContent='Clave incorrecta.';document.getElementById('pinVerificar').value='';return;}document.getElementById('modalVerificar').classList.remove('open');_doEliminar(pendingDeleteIdx);pendingDeleteIdx=null;}
 function _doEliminar(i){
-  const cmdId = comandas[i]?.id;
+  const cmd = comandas[i];
+  if(!cmd) return;
   comandas.splice(i,1);
   guardarLocal();
-  if(cmdId) eliminarComandaSupabase(cmdId);
+  eliminarComandaSupabase(cmd);
   renderHistorial();renderDashboard();toast('🗑 Comanda eliminada');
 }
 const preguntas={mascota:'¿Nombre de tu mascota?',madre:'¿Nombre de tu madre?',ciudad:'¿Ciudad donde naciste?',colegio:'¿Tu primer colegio?',plato:'¿Tu plato favorito?'};
@@ -2128,9 +2130,12 @@ function renderDashboard(){
 }
 
 
-// ══════════════════════════════════════════
-//  SUPABASE — COMANDAS SINCRONIZADAS
-// ══════════════════════════════════════════
+// Helper para generar ID único en Supabase (evita colisiones de IDs repetidos en días distintos)
+function getSupabaseId(cmd){
+  if(!cmd.id) return Date.now().toString();
+  const fechaLimpia = (cmd.fecha || '').replace(/\//g,'');
+  return `${cmd.id}_${fechaLimpia || '000000'}`;
+}
 
 async function cargarComandasSupabase(){
   if(!cfg.clienteId) return;
@@ -2152,7 +2157,8 @@ async function cargarComandasSupabase(){
       // Cargar archivo (merge con lo que ya hay en local para no perder nada)
       const archivoLocal = getArchivo();
       archivadas.forEach(cmd => {
-        if(!archivoLocal.find(a => a.id === cmd.id)){
+        // Verificar duplicados por ID y fecha para la carga inicial desde la nube
+        if(!archivoLocal.find(a => a.id === cmd.id && a.fecha === cmd.fecha)){
           archivoLocal.push({...cmd, archivadoEl: cmd.archivadoEl || new Date().toISOString()});
         }
       });
@@ -2169,7 +2175,7 @@ async function guardarComandaSupabase(comanda){
     const { error } = await db
       .from('comandas')
       .upsert({
-        id: comanda.id,
+        id: getSupabaseId(comanda),
         cliente_id: cfg.clienteId,
         datos: comanda,
         updated_at: new Date().toISOString()
@@ -2186,7 +2192,7 @@ async function actualizarComandaSupabase(comanda){
     const { error } = await db
       .from('comandas')
       .update({ datos: comanda, updated_at: new Date().toISOString() })
-      .eq('id', comanda.id)
+      .eq('id', getSupabaseId(comanda))
       .eq('cliente_id', cfg.clienteId);
     if(error) throw error;
   } catch(e){
@@ -2194,13 +2200,13 @@ async function actualizarComandaSupabase(comanda){
   }
 }
 
-async function eliminarComandaSupabase(comandaId){
-  if(!cfg.clienteId) return;
+async function eliminarComandaSupabase(comanda){
+  if(!cfg.clienteId || !comanda) return;
   try{
     const { error } = await db
       .from('comandas')
       .delete()
-      .eq('id', comandaId)
+      .eq('id', getSupabaseId(comanda))
       .eq('cliente_id', cfg.clienteId);
     if(error) throw error;
   } catch(e){
@@ -2225,7 +2231,10 @@ function archivarComandasDelDia(hoyStr){
   if(!paraArchivar.length) return 0;
   paraArchivar.forEach(cmd=>{
     if(!archivo.find(a=>a.id===cmd.id&&a.fecha===cmd.fecha)){
-      archivo.push({...cmd, archivadoEl:new Date().toISOString()});
+      const cmdArch = {...cmd, archivadoEl:new Date().toISOString()};
+      archivo.push(cmdArch);
+      // Sincronizar también con la nube
+      guardarComandaArchivedSupabase(cmdArch);
     }
   });
   saveArchivo(archivo);
@@ -2255,7 +2264,13 @@ function archivarDiasAnteriores(){
   const anteriores = comandas.filter(c=>c.fecha && c.fecha!==hoy);
   if(!anteriores.length) return;
   anteriores.forEach(cmd=>{
-    if(!archivo.find(a=>a.id===cmd.id)) archivo.push({...cmd,archivadoEl:new Date().toISOString()});
+    // Usar (ID + Fecha) para evitar colisiones
+    if(!archivo.find(a=>a.id===cmd.id && a.fecha===cmd.fecha)){
+      const cmdArch = {...cmd, archivadoEl:new Date().toISOString()};
+      archivo.push(cmdArch);
+      // Sincronizar con la nube
+      guardarComandaArchivedSupabase(cmdArch);
+    }
   });
   saveArchivo(archivo);
   comandas = comandas.filter(c=>!c.fecha||c.fecha===hoy);
@@ -2333,33 +2348,42 @@ function renderArchivo(){
   filtradas.sort((a,b)=>new Date(b.timestamp||0)-new Date(a.timestamp||0));
 
   list.innerHTML = filtradas.map(c=>{
-    const estadoColor = c.estadoPago==='pagado'?'var(--green)':c.estadoPago==='cancelada'?'var(--red)':'var(--orange)';
-    const estadoLabel = c.estadoPago==='pagado'?'✅ Pagada':c.estadoPago==='cortesia'?'🎁 Cortesía':c.estadoPago==='cancelada'?'❌ Cancelada':'⏳ Pendiente';
-    const metodosPago = c.pago ? Object.entries(c.pago)
-      .filter(([k,v])=>k!=='descuento'&&k!=='cortesia'&&typeof v==='number')
-      .map(([k,v])=>`${k}: ${fmtNum(v)}`).join(' · ') : '';
-    return `<div class="hist-card" style="opacity:0.95">
-      <div class="hist-header">
-        <div class="hist-info">
-          <div class="hist-num">#${c.id}</div>
-          <div class="hist-mesa">${c.mesa||'Sin Mesa'}</div>
-          <div class="hist-meta">${c.fecha} · ${c.hora} · ${c.tipo||'S/T'}</div>
+    try {
+      const items = c.items || [];
+      const estadoColor = c.estadoPago==='pagado'?'var(--green)':c.estadoPago==='cancelada'?'var(--red)':'var(--orange)';
+      const estadoLabel = c.estadoPago==='pagado'?'✅ Pagada':c.estadoPago==='cortesia'?'🎁 Cortesía':c.estadoPago==='cancelada'?'❌ Cancelada':'⏳ Pendiente';
+      const metodosPago = c.pago ? Object.entries(c.pago)
+        .filter(([k,v])=>k!=='descuento'&&k!=='cortesia'&&typeof v==='number')
+        .map(([k,v])=>`${k}: ${fmtNum(v)}`).join(' · ') : '';
+      
+      return `<div class="hist-card" style="opacity:0.95">
+        <div class="hist-header">
+          <div class="hist-info">
+            <div class="hist-num">#${c.id || '---'}</div>
+            <div class="hist-mesa">${c.mesa||'Sin Mesa'}</div>
+            <div class="hist-meta">${c.fecha || ''} · ${c.hora || ''} · ${c.tipo||'S/T'}</div>
+          </div>
+          <div>
+            <div class="hist-total">${c.tiene_precios?fmtNum(c.subtotal):items.length+' ítems'}</div>
+            <div style="font-size:10px;color:${estadoColor};font-weight:700;text-align:right;margin-top:4px">${estadoLabel}</div>
+          </div>
         </div>
-        <div>
-          <div class="hist-total">${c.tiene_precios?fmtNum(c.subtotal):c.items.length+' ítems'}</div>
-          <div style="font-size:10px;color:${estadoColor};font-weight:700;text-align:right;margin-top:4px">${estadoLabel}</div>
+        <div class="hist-items" style="font-size:13px">
+          ${items.slice(0,4).map(it=>{
+            if(!it) return '';
+            return `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.03)">
+            <span><b style="color:var(--accent)">${it.qty||it.cantidad||1}x</b> ${it.name||it.nombre||'?'}</span>
+            ${c.tiene_precios&&(it.unit_price||it.precio)?`<span style="font-family:var(--mono);color:var(--muted);font-size:11px">${fmtNum((it.qty||it.cantidad||1)*(it.unit_price||it.precio||0))}</span>`:''}
+          </div>`}).join('')}
+          ${items.length>4?`<div style="font-size:10px;color:var(--muted);margin-top:4px">+${items.length-4} ítems más</div>`:''}
         </div>
-      </div>
-      <div class="hist-items" style="font-size:13px">
-        ${c.items.slice(0,4).map(it=>`<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.03)">
-          <span><b style="color:var(--accent)">${it.qty||1}x</b> ${it.name||it.nombre||'?'}</span>
-          ${c.tiene_precios&&(it.unit_price||it.precio)?`<span style="font-family:var(--mono);color:var(--muted);font-size:11px">${fmtNum((it.qty||1)*(it.unit_price||it.precio||0))}</span>`:''}
-        </div>`).join('')}
-        ${c.items.length>4?`<div style="font-size:10px;color:var(--muted);margin-top:4px">+${c.items.length-4} ítems más</div>`:''}
-      </div>
-      ${metodosPago?`<div style="font-size:11px;color:var(--muted);font-family:var(--mono);padding-top:8px;border-top:1px solid var(--border)">${metodosPago}</div>`:''}
-      ${c.notas?`<div style="font-size:11px;color:var(--muted)">📝 ${c.notas}</div>`:''}
-    </div>`;
+        ${metodosPago?`<div style="font-size:11px;color:var(--muted);font-family:var(--mono);padding-top:8px;border-top:1px solid var(--border)">${metodosPago}</div>`:''}
+        ${c.notas?`<div style="font-size:11px;color:var(--muted)">📝 ${c.notas}</div>`:''}
+      </div>`;
+    } catch(err) {
+      console.error("Error renderizando comanda archivada:", err, c);
+      return ''; // No romper el resto de la lista
+    }
   }).join('');
 }
 
