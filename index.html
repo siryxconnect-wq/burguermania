@@ -2379,7 +2379,7 @@ function renderProductosPanel(){
 
   // Primero los manuales
   manuales.forEach(p=>{
-    html += `<div class="prod-chip manual" onclick="agregarProductoComanda('${p.nombre.replace(/'/g,"\'")}',${p.precio})" title="${p.nombre}${p.precio?' — '+fmtNum(p.precio):''}">
+    html += `<div class="prod-chip manual" onclick="agregarProductoComanda('${p.nombre.replace(/'/g,"\\'")}',${p.precio})" title="${p.nombre}${p.precio?' — '+fmtNum(p.precio):''}">
       <span class="chip-name">${p.nombre}</span>
       ${p.precio?`<span class="chip-price">${fmtNum(p.precio)}</span>`:''}
     </div>`;
@@ -2389,7 +2389,7 @@ function renderProductosPanel(){
   const nombresManual = manuales.map(p=>p.nombre.toLowerCase());
   topIA.forEach(([nombre,count])=>{
     if(nombresManual.includes(nombre.toLowerCase())) return;
-    html += `<div class="prod-chip" onclick="agregarProductoComanda('${nombre.replace(/'/g,"\'")}',0)" title="${nombre} — pedido ${count} vez(ces)">
+    html += `<div class="prod-chip" onclick="agregarProductoComanda('${nombre.replace(/'/g,"\\'")}',0)" title="${nombre} — pedido ${count} vez(ces)">
       <span class="chip-name">${nombre}</span>
       <span class="chip-count">${count}</span>
     </div>`;
@@ -2525,7 +2525,7 @@ function renderMenuPanel(){
     return;
   }
   gridEl.innerHTML = platos.map((p,i)=>
-    `<div class="menu-item-card" onclick="agregarPlatoComanda('${p.nombre.replace(/'/g,"\'")}',${p.precio})" title="Agregar al pedido">
+    `<div class="menu-item-card" onclick="agregarPlatoComanda('${p.nombre.replace(/'/g,"\\'")}',${p.precio})" title="Agregar al pedido">
       <span class="menu-item-cat">${_catActiva}</span>
       <span class="menu-item-name">${p.nombre}</span>
       <span class="menu-item-price">${p.precio?fmtNum(p.precio):'Sin precio'}</span>
@@ -2604,14 +2604,14 @@ function renderMenuListaModal(){
     <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
       <div style="background:var(--s2);padding:10px 14px;display:flex;align-items:center;justify-content:space-between">
         <span style="font-size:13px;font-weight:800;color:var(--accent)">${cat}</span>
-        <button onclick="eliminarCategoria('${cat.replace(/'/g,"\'")}'')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:12px">🗑 Eliminar categoría</button>
+        <button onclick="eliminarCategoria('${cat.replace(/'/g,"\\'")}')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:12px">🗑 Eliminar categoría</button>
       </div>
       <div style="padding:8px">
         ${menu[cat].length?menu[cat].map((p,i)=>`
           <div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;background:var(--bg)">
             <span style="flex:1;font-size:13px">${p.nombre}</span>
             <span style="font-family:var(--mono);font-size:12px;color:var(--accent)">${p.precio?fmtNum(p.precio):'sin precio'}</span>
-            <button onclick="eliminarPlatoMenu('${cat.replace(/'/g,"\'")}',${i})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px">✕</button>
+            <button onclick="eliminarPlatoMenu('${cat.replace(/'/g,"\\'")}',${i})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px">✕</button>
           </div>`).join(''):'<div style="color:var(--muted);font-size:11px;padding:6px">Sin platos — agrega uno arriba</div>'}
       </div>
     </div>`).join('');
