@@ -1944,17 +1944,35 @@ function renderHistorial(){
 function archivarComanda(i){
   const cmd = comandas[i];
   if(!cmd) return;
+  // Guardar en archivo local
   const archivo = getArchivo();
-  if(!archivo.find(a=>a.id===cmd.id&&a.fecha===cmd.fecha)){
+  if(!archivo.find(a=>a.id===cmd.id)){
     archivo.push({...cmd, archivadoEl:new Date().toISOString()});
     saveArchivo(archivo);
   }
+  // Quitar del historial activo
   comandas.splice(i,1);
   guardarLocal();
-  eliminarComandaSupabase(cmd.id);
+  // Marcar como archivada en Supabase
+  guardarComandaArchivedSupabase({...cmd, archivadoEl:new Date().toISOString()});
   renderHistorial();
   renderDashboard();
   toast('🗂 Comanda #'+cmd.id+' archivada');
+}
+
+async function guardarComandaArchivedSupabase(comanda){
+  if(!cfg.clienteId) return;
+  try{
+    await db.from('comandas').upsert({
+      id: comanda.id,
+      cliente_id: cfg.clienteId,
+      datos: comanda,
+      archivada: true,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'id,cliente_id' });
+  } catch(e){
+    console.warn('Error archivando en Supabase:', e.message);
+  }
 }
 function reimprimirHist(i){ ordenActual=comandas[i]; renderTicket(comandas[i]); imprimirWindows(); }
 function copiarHist(i){ navigator.clipboard.writeText(generarTextoPlano(comandas[i])).then(()=>toast('✅ Copiado')).catch(()=>toast('✅ Copiado')); }
@@ -2119,14 +2137,26 @@ async function cargarComandasSupabase(){
   try{
     const { data, error } = await db
       .from('comandas')
-      .select('id, datos')
+      .select('id, datos, archivada')
       .eq('cliente_id', cfg.clienteId)
       .order('created_at', {ascending:false});
     if(error) throw error;
     if(data && data.length){
-      comandas = data.map(r => r.datos);
+      // Separar activas y archivadas
+      const activas = data.filter(r => !r.archivada).map(r => r.datos);
+      const archivadas = data.filter(r => r.archivada).map(r => r.datos);
+      // Cargar historial activo
+      comandas = activas;
       localStorage.setItem('siryx_comandas', JSON.stringify(comandas));
       document.getElementById('histBadge').textContent = comandas.length;
+      // Cargar archivo (merge con lo que ya hay en local para no perder nada)
+      const archivoLocal = getArchivo();
+      archivadas.forEach(cmd => {
+        if(!archivoLocal.find(a => a.id === cmd.id)){
+          archivoLocal.push({...cmd, archivadoEl: cmd.archivadoEl || new Date().toISOString()});
+        }
+      });
+      saveArchivo(archivoLocal);
     }
   } catch(e){
     console.warn('Supabase no disponible, usando datos locales:', e.message);
