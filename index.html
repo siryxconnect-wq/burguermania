@@ -566,6 +566,7 @@ select { appearance:auto; }
   <div style="padding:24px 32px 0;display:flex;gap:12px;flex-wrap:wrap;align-items:center">
     <div style="font-size:13px;font-weight:700;color:var(--muted)">Filtrar por:</div>
     <select id="archivoFiltroTipo" class="meta-input" style="width:140px;font-size:12px" onchange="renderArchivo()">
+      <option value="todas">Todas</option>
       <option value="dia">Por día</option>
       <option value="mes">Por mes</option>
       <option value="anio">Por año</option>
@@ -2232,14 +2233,8 @@ function archivarDiasAnteriores(){
 }
 
 function accederArchivo(btn){
-  if(!cfg.adminHash){
-    toast('⚠️ Configura una clave de administrador en ⚙️ para acceder al archivo');
-    return;
-  }
-  const clave = prompt('🔐 Clave de administrador para ver el Archivo Histórico:');
-  if(clave===null) return;
-  if(hashSimple(clave)!==cfg.adminHash){ toast('❌ Clave incorrecta'); return; }
   switchTab('archivo', btn);
+  document.getElementById('archivoFiltroTipo').value = 'todas';
   inicializarFiltrosArchivo();
   renderArchivo();
 }
@@ -2276,7 +2271,9 @@ function renderArchivo(){
   const archivo = getArchivo();
   let filtradas = [];
 
-  if(tipo==='dia'){
+  if(tipo==='todas'){
+    filtradas = [...archivo];
+  } else if(tipo==='dia'){
     const diaVal = diaEl.value; // yyyy-mm-dd
     if(!diaVal) return;
     const partes = diaVal.split('-');
